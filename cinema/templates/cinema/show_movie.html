@@ -1,0 +1,21 @@
+{% extends 'cinema/base.html' %}
+{% block title %} {{movie}} {% endblock %}
+
+{% block content %}
+ 
+    <h1>{{movie}}</h1>
+    <p>{{movie.description}}</p >
+    <img class="card-img-top" src="{{movie.image.url}}" alt="Card image cap" style="width: 17rem">
+    <br>
+    <h2>showtimes</h2>
+        {% for date in movie.date_set.all %}
+        <li>{{ date.date }}  {{date.time}}</li>
+
+        {% endfor %}
+    </ul>
+
+
+
+
+    
+{% endblock %}  

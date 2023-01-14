@@ -1,0 +1,21 @@
+{% extends 'cinema/base.html' %}
+{% block title %}View Movies{% endblock %}
+
+{% block content %}
+
+<h1>showings</h1>
+
+<ul></ul>
+<!-- all products -->
+<div class="col-lg-9 mx-auto">
+    <div class="row mx-auto">
+        {% for movie in movies %}
+        <div class="card mx-auto mb-3" style="width: 19rem;">
+            <a href="{% url 'show-movie' movie.id%}"><img class="card-img-top" src="{{movie.image.url}}" alt="Card image cap"> </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+  
+    
+{% endblock %}  
