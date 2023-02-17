@@ -21,6 +21,28 @@ class Date(models.Model):
     def __str__(self):
         return '%s %s' % (self.date, self.time)
 
+
+
+
+class Ticket(models.Model):
+    ticket_id = models.PositiveIntegerField(primary_key=True, db_column='ticket_id')
+    ticket_price = models.FloatField()
+    movie = models.ForeignKey(Movie,on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    ticket_type = models.CharField(max_length=20,default="Customer")
+    
+    def __str__(self):
+        return self.quantity, self.ticket_id
+
+
+class Screens(models.Model):
+    number = models.IntegerField() 
+    capacity = models.IntegerField()
+    def __str__(self):
+        return str(self.number)
+
+
+
 #class Time(models.Model):
 #    dates = models.ForeignKey(Date, on_delete=models.CASCADE)
 #    time = models.CharField(max_length=50)

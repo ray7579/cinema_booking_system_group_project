@@ -6,6 +6,7 @@ urlpatterns = [
     path("", views.home, name = "home"),
     path("movies/", views.list_movies, name = "list_movies"),
     path("show_movie/<movie_id>", views.show_movie, name = "show-movie"),
+    path("confirmation/<movie_id>",views.confirm_movie,name = "confirm_movie"),
 
 ]
 
