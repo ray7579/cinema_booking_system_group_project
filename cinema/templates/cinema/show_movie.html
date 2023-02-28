@@ -60,6 +60,7 @@
     <div>
         <h1 class="movie-title">{{ movie }}</h1>
         <p class="movie-description">{{ movie.description }}</p>
+        <p class="movie-duration">{{ movie.duration }}</p>
         <h2 class="showtimes">Showtimes</h2>
         <ul class="showtime-list">
             {% for date in movie.date_set.all %}
