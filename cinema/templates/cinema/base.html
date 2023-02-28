@@ -2,6 +2,9 @@
 <html>
     <head>
         <style type="text/css">
+            .content {
+                text-align: center;
+            }
             .main {
                 margin-top: 50px;
                 margin-left: 100px;
@@ -43,6 +46,10 @@
                 margin-right: auto !important;
                 color: white !important;
             }
+            .padded-navbar-text {
+                padding: 5rem;
+            }
+
         </style>
         
         <!-- Required meta tags -->
@@ -69,7 +76,7 @@
                 <ul class="nav navbar-nav">
                     <li class="nav-item">
                         <span class="navbar-text">
-                            Hello {{request.user.username}}
+                            Hello {{request.user.username  }}   
                         </span>
                     </li>
                     <li class="nav-item">
@@ -108,7 +115,7 @@
         </nav>
         {% endif %}
         
-        <div id="content", name="content", class="main" style="text-align: center;">
+        <div id="content" name="content" class="content">
             {% block content %}
             {% endblock %}
         </div>
