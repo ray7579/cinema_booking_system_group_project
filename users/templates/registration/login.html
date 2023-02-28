@@ -3,19 +3,25 @@
 {% block title %}Login{% endblock %}
 {% block content %}
 
+<style>
+    /* Set text color to white */
+    body {
+        color: white;
+    }
 
-<h1>login</h1>
+    /* Add a box around the form */
+    .form-group {
+        border: 1px solid white;
+        padding: 10px;
+    }
+</style>
 <br/><br/>
-
 <div class="form-group">
+    <h1>Login</h1>
     <form method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button class = "btn btn-secondary">Login</button>
+        {{ form.as_table }}
+        <button class="btn btn-secondary">Login</button>
     </form>
-
-
 </div>
-
-
 {% endblock %}
