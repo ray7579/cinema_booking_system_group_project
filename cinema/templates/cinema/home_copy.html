@@ -1,0 +1,19 @@
+{% extends 'cinema/base.html' %}
+{% block title %}Cinema Manager{% endblock %}
+
+{% block content %}
+<h1> Home Page: All the Films </h1>
+<button onclick="window.location.href='addfilm/'" class="btn btn-secondary"> Add Film</button>
+{% for movie in movie%}
+<p> Film Name: {{ movie.name }} <br/>
+    Film Age Rating: {{ movie.age_rating }} <br/>
+    Film Description:{{ movie.description }} <br/>
+    Film Duration:{{ movie.duration }} <br/>
+    <button onclick="window.location.href='updatefilm/{{ movie.id }}'" class="btn btn-outline-danger"> Update Film</button>
+    <button onclick="window.location.href='delete/{{ movie.id }}'" class="btn btn-outline-danger"> Delete Film</button>
+    
+    <hr>
+{% endfor %}
+
+
+{%endblock%}

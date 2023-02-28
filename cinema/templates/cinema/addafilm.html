@@ -1,0 +1,20 @@
+{% extends 'cinema/base.html' %}
+{% block title %}Cine Man{% endblock %}
+{% block content %}
+<h1> Add Film </h1>
+
+<form method="POST" enctype="multipart/form-data" action={% url 'addfilm' %}>
+    {% csrf_token %}
+    <input type="text" class="form-control" placeholder= "Film Name" name="name" > <br/>
+    {% csrf_token %}
+    <input type="text" class="form-control" placeholder= "Film Age" name="age_rating" > <br/>
+    {% csrf_token %}
+    <input type="text" class="form-control" placeholder= "Film Description" name="description" > <br/>
+    {% csrf_token %}
+    <input type="text" class="form-control" placeholder= "Duration" name="duration" > <br/>
+    {% csrf_token %}
+    <input type="file" class="form-control" placeholder= "Image" name="image" > <br/> <br/>
+    {% csrf_token %}
+    <p> H </p>
+    <button type="submit" class="btn btn-secondary"> Add Film </button>
+{%endblock%}
