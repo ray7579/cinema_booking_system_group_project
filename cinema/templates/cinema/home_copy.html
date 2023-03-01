@@ -1,11 +1,12 @@
 {% extends 'cinema/base.html' %}
+
 {% block title %}Cinema Manager{% endblock %}
 
 {% block content %}
-<h1> Home Page: All the Films </h1>
+<h1 class="text-white"> Home Page: All the Films </h1>
 <button onclick="window.location.href='addfilm/'" class="btn btn-secondary"> Add Film</button>
 {% for movie in movie%}
-<p> Film Name: {{ movie.name }} <br/>
+<p class="text-white"> Film Name: {{ movie.name }} <br/>
     Film Age Rating: {{ movie.age_rating }} <br/>
     Film Description:{{ movie.description }} <br/>
     Film Duration:{{ movie.duration }} <br/>
@@ -16,4 +17,10 @@
 {% endfor %}
 
 
-{%endblock%}
+{% endblock %}
+
+<style>
+  .text-white {
+    color: #ffffff;
+  }
+</style>
