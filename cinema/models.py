@@ -6,6 +6,7 @@ class Movie(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(null=True, max_length=500)
     age_rating = models.CharField(null=True, max_length=50)
+    duration = models.CharField( null=True, max_length=50)
     image = models.ImageField(upload_to='covers/', null=True)
 
     def __str__(self):
