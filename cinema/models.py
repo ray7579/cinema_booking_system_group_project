@@ -36,13 +36,22 @@ class Ticket(models.Model):
         return self.quantity, self.ticket_id
 
 
-class Screens(models.Model):
-    number = models.IntegerField() 
-    capacity = models.IntegerField()
+class Screen(models.Model):
+    number = models.PositiveIntegerField(max_length=2)
+    capacity = models.PositiveIntegerField(max_length=2)
+    
     def __str__(self):
-        return str(self.number)
+        return self.name
 
 
+class Showing(models.Model):
+    film = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    screen = models.ForeignKey(Screen, on_delete=models.CASCADE)
+    date = models.DateField()
+    time = models.TimeField()
+        
+    def __str__(self):
+        return f"{self.film.title} - {self.date} {self.time}"
 
 #class Time(models.Model):
 #    dates = models.ForeignKey(Date, on_delete=models.CASCADE)
