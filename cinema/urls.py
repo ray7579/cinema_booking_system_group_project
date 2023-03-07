@@ -11,6 +11,10 @@ urlpatterns = [
     path('renfilmhome/updatefilm/<movie_id>', views.updatefilm, name="updatefilm"),
     path('renfilmhome/delete/<film_id>', views.delete, name="delete"),
     path('renfilmhome/', views.renfilmhome, name = "renfilmhome"),
+    path('renscreenhome/addscreen/', views.addscreen, name="addscreen"),
+    path('renscreenhome/updatescreen/<screen_id>', views.updatescreen, name="updatescreen"),
+    path('renscreenhome/deletescreen/<screen_id>', views.deletescreen, name="deletescreen"),
+    path('renscreenhome/', views.renscreenhome, name = "renscreenhome"),
 
 ]
 
