@@ -1,7 +1,7 @@
 {% extends 'cinema/base.html' %}
 {% block title %}Cine Man{% endblock %}
 {% block content %}
-<h1> Add Film </h1>
+<h1> Add Screen </h1>
 
 <form method="POST" enctype="multipart/form-data" action={% url 'addscreen' %}>
     {% csrf_token %}
