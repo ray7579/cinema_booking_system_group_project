@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
-from .models import Movie, Date, Ticket
-from .forms import filmForm
+from .models import Movie, Date, Ticket, Screen, Showing
+from .forms import filmForm, screenForm, showingForm
 
 def home(response):
     user = response.user
@@ -57,5 +57,40 @@ def delete(request, film_id):
     return redirect(renfilmhome)
 
 
+def renscreenhome(request):
+    screen = Screen.objects.all()
+    # if request.method == "POST":
+    #     form = filmForm(request.POST or None)
+    #     if form.is_valid():
+    #         form.save()
+    return render(request, 'cinema/cinman_screen.html', {'screen': screen})
+    # else:
+    #     return render(request, 'home.html', {'all': allFilm})
 
+
+def addscreen(request):
+    if request.method == "POST":
+        form = screenForm(request.POST, request.FILES or None)
+        if form.is_valid():
+            form.save()
+        return redirect(renscreenhome)
+    else:
+        return render(request, 'cinema/addascreen.html', {})
+
+
+def updatescreen(request, screen_id):
+        update = Screen.objects.get(id=screen_id)
+        form = screenForm(request.POST, request.FILES or None, instance=update)
+        if form.is_valid():
+            form.save()
+            return redirect(renscreenhome)
+        
+        return render(request, 'cinema/updatescreen.html', {'form': form})
+
+
+
+def deletescreen(request, screen_id):
+    deleting = Screen.objects.get(id=screen_id)
+    deleting.delete()
+    return redirect(renscreenhome)
 
