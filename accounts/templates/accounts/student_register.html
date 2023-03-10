@@ -1,11 +1,24 @@
 {% extends 'accounts/base.html' %}
+{% block title %}Register{% endblock %}
 
 {% block content %}
-<h1>student register</h1>
+<div class="d-flex justify-content-center">
+  <div class="card bg-light mb-3" style="max-width: 50rem;">
+    <div class="card-header">Register</div>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-secondary">Register</button>
+      </form>
+    </div>
+  </div>
+</div>
 
-<form action="{% url 'student_register' %}" method = "POST" novalidate>
-    {% csrf_token %}
-    {{form}}
-    <button class = "btn btn-secondary">Register</button>
-
+<style>
+  .card {
+    background-color: #ffffff;
+    border-color: #ffffff;
+  }
+</style>
 {% endblock %}
