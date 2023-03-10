@@ -1,60 +1,67 @@
-{% extends 'cinema/base.html' %}
+{% extends 'accounts/base.html' %}
 
 {% block title %} {{ movie.title }} {% endblock %}
 
 {% block content %}
 
 <style>
+    body {
+        background-color: #181818;
+        color: #FFFFFF;
+        font-family: Arial, sans-serif;
+    }
     .movie-details {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
         align-items: center;
-        margin: 2rem;
-        color: white;
+        margin-top: 2rem;
     }
-
     .movie-image {
-        flex: 0 0 calc(50% - 1rem);
-        margin-right: 2rem;
+        flex: 0 0 20rem;
+        margin-right: 3rem;
+    }
+    .movie-title {
+        font-size: 3rem;
         margin-bottom: 2rem;
     }
-
     .movie-description {
-        flex: 0 0 calc(50% - 1rem);
+        font-size: 1.2rem;
+        line-height: 1.5;
+        margin-bottom: 2rem;
     }
-
-    .movie-image img {
-        max-width: 50%;
+    .showtimes {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
     }
-
+    .showtime-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .showtime-item {
+        margin-bottom: 1rem;
+    }
     .book-button {
         background-color: #E50914;
-        border: 2px solid #E50914;
+        border: none;
         color: #FFFFFF;
         font-size: 1.5rem;
         padding: 1rem 2rem;
         cursor: pointer;
         transition: all 0.2s ease-in-out;
     }
-
     .book-button:hover {
         background-color: #FFFFFF;
         color: #E50914;
     }
 </style>
-
 <div class="movie-details">
     <div class="movie-image">
-        <img src="{{ movie.image.url }}" alt="{{ movie.title }} poster">
+        <img src="{{ movie.image.url }}" alt="{{ movie.title }} poster" style="width: 100%;">
     </div>
-    <div class="movie-description">
+    <div>
         <h1 class="movie-title">{{ movie }}</h1>
-        <h5>Description</h5>
         <p class="movie-description">{{ movie.description }}</p>
-        <h5>Duration</h5>
         <p class="movie-duration">{{ movie.duration }}</p>
-        <h5>Showtimes</h5>
+        <h2 class="showtimes">Showtimes</h2>
         <ul class="showtime-list">
             {% for date in movie.date_set.all %}
             <li class="showtime-item">{{ date.date }} {{ date.time }}</li>

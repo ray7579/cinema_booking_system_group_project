@@ -1,14 +1,14 @@
-{% extends 'cinema/base.html' %}
+{% extends 'accounts/base.html' %}
 
 {% block title %}View Movies{% endblock %}
 
 {% block content %}
     <h1 style="font-family: 'Andale Mono', monospace; font-weight: bold; font-style: italic;">Showings</h1>
 
-    <div class="container" style="overflow-x: auto; white-space: nowrap; margin: 0 auto;">
+    <div class="container" style="overflow-x: auto; white-space: nowrap;">
         {% for movie in movies %}
             <div class="d-inline-block" style="width: 390px; height: 585px; margin-right: 15px;">
-                <a href="{% url 'show-movie' movie.id%}"><img src="{{ movie.image.url }}" alt="{{ movie.title }}" style="width: 100%; height: 100%; object-fit: contain;"></a>
+                <a href="{% url 'show_movie' movie.id%}"><img src="{{ movie.image.url }}" alt="{{ movie.title }}" style="width: 100%; height: 100%; object-fit: contain;"></a>
             </div>
         {% endfor %}
     </div>
