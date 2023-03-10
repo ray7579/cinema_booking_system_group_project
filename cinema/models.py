@@ -1,10 +1,10 @@
 from django.db import models
 
-# Create your models here.
+
 
 class Movie(models.Model):
     name = models.CharField(max_length=200)
-    description = models.CharField(null=True, max_length=500)
+    description = models.CharField(null=True, max_length=1000)
     age_rating = models.CharField(null=True, max_length=50)
     duration = models.CharField( null=True, max_length=50)
     image = models.ImageField(upload_to='covers/', null=True)
@@ -52,13 +52,3 @@ class Showing(models.Model):
         
     def __str__(self):
         return f"{self.film.title} - {self.date} {self.time}"
-
-#class Time(models.Model):
-#    dates = models.ForeignKey(Date, on_delete=models.CASCADE)
-#    time = models.CharField(max_length=50)
-#
-#    def __str__(self):
-#        return self.time
-
-
-#class Capacity
