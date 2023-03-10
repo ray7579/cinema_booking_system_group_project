@@ -1,23 +1,8 @@
-{% extends 'cinema/base.html' %}
+{% extends 'accounts/base.html' %}
 
 {% block content %}
-    <div class="welcome-container">
-        <h1 class="welcome-header">Welcome to UWEFlix {{request.user.username}}</h1>
-    </div>
-    <style>
-        body {
-            color: white;
-        }
+<h1>Welcome to  UWEFlix</h1>
 
-        .welcome-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 50vh;
-        }
+    
 
-        .welcome-header {
-            font-family: 'Andalé Mono', monospace;
-        }
-    </style>
 {% endblock %}
