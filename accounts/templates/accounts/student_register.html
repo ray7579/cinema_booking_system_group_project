@@ -3,17 +3,17 @@
 
 {% block content %}
 <div class="d-flex justify-content-center">
-  <div class="card bg-light mb-3" style="max-width: 50rem;">
-    <div class="card-header">Register</div>
-    <div class="card-body">
-      <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn btn-secondary">Register</button>
-      </form>
+    <div class="card bg-light mb-3" style="max-width: 700px;">
+      <div class="card-header">Register</div>
+      <div class="card-body">
+        <form method="POST">
+          {% csrf_token %}
+          {{ form.as_div }}
+          <button class="btn btn-secondary">Register</button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 
 <style>
   .card {
