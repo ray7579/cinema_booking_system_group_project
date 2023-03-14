@@ -24,12 +24,9 @@ class showingForm(forms.ModelForm):
     class Meta:
         model = Showing
         fields = ['film', 'screen', 'date', 'time']
-<<<<<<< HEAD
         widgets = {
             'film': forms.Select(attrs={'class': 'form-control'}),
             'screen': forms.Select(attrs={'class': 'form-control'}),
             'date': forms.DateInput(attrs={'class': 'form-control'}),
             'time': forms.TimeInput(attrs={'class': 'form-control'}),
         }
-=======
->>>>>>> origin/main

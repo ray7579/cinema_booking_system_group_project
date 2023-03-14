@@ -109,7 +109,6 @@ def deletescreen(request, screen_id):
     deleting = Screen.objects.get(id=screen_id)
     deleting.delete()
     return redirect(renscreenhome)
-<<<<<<< HEAD
 
 def renshowhome(request):
     showing = Showing.objects.all()
@@ -159,6 +158,3 @@ def deleteshow(request, showing_id):
     deleting = Showing.objects.get(id=showing_id)
     deleting.delete()
     return redirect(renshowhome)
-=======
-    
->>>>>>> origin/main

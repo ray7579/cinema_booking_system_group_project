@@ -51,7 +51,6 @@ class Showing(models.Model):
     time = models.TimeField()
         
     def __str__(self):
-<<<<<<< HEAD
         return self.film, self.screen, self.date, self.time
 
 #class Time(models.Model):
@@ -63,6 +62,3 @@ class Showing(models.Model):
 
 
 #class Capacity
-=======
-        return f"{self.film.title} - {self.date} {self.time}"
->>>>>>> origin/main

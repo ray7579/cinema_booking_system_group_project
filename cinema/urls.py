@@ -14,7 +14,6 @@ urlpatterns=[
     path('renscreenhome/updatescreen/<screen_id>', views.updatescreen, name="updatescreen"),
     path('renscreenhome/deletescreen/<screen_id>', views.deletescreen, name="deletescreen"),
     path('renscreenhome/', views.renscreenhome, name = "renscreenhome"),
-<<<<<<< HEAD
     path('renshowhome/renaddshow/', views.renaddshow, name="renaddshow"),
     path('renshowhome/renaddshow/addshow/', views.addshow, name="addshow"),
     path('renshowhome/updateshow/<showing_id>', views.updateshow, name="updateshow"),
@@ -23,8 +22,3 @@ urlpatterns=[
 ]
 
 
-=======
-
-    
-]
->>>>>>> origin/main
