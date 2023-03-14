@@ -1,6 +1,6 @@
-{% extends 'cinema/base.html' %}
+{% extends 'accounts/base.html' %}
 
-{% block title %} {{ movie.title }} {% endblock %}
+{% block title %} {{ movie }} {% endblock %}
 
 {% block content %}
 
@@ -16,8 +16,6 @@
 
     .movie-image {
         flex: 0 0 calc(50% - 1rem);
-        margin-right: 2rem;
-        margin-bottom: 2rem;
     }
 
     .movie-description {
@@ -25,7 +23,7 @@
     }
 
     .movie-image img {
-        max-width: 50%;
+        height: 600px;
     }
 
     .book-button {

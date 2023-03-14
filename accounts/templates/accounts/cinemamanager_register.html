@@ -1,0 +1,26 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-center">
+    <div class="card bg-light mb-3" style="max-width: 700px;">
+      <div class="card-header">Cinema Manager Register</div>
+        <div class="card-body">
+          <form action="{% url 'cinemamanager_register' %}" method="POST" novalidate>
+            {% csrf_token %}
+            {{ form.as_div }}
+            <button class="btn btn-secondary">Register</button>
+          </form>
+        </div>
+    </div>
+</div>
+
+<style>
+  .card {
+    background-color: #ffffff;
+    border-color: #ffffff;
+  }
+  div {
+    padding: 5px;
+  }
+</style>
+{% endblock %}
