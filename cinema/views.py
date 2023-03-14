@@ -109,4 +109,52 @@ def deletescreen(request, screen_id):
     deleting = Screen.objects.get(id=screen_id)
     deleting.delete()
     return redirect(renscreenhome)
-    
+
+def renshowhome(request):
+    showing = Showing.objects.all()
+    # if request.method == "POST":
+    #     form = filmForm(request.POST or None)
+    #     if form.is_valid():
+    #         form.save()
+    return render(request, 'cinema/cinman_show.html', {'showing': showing})
+    # else:
+    #     return render(request, 'home.html', {'all': allFilm})
+
+def renaddshow(request):
+    film = Movie.objects.all()
+    screen = Screen.objects.all()
+    # if request.method == "POST":
+    #     form = filmForm(request.POST or None)
+    #     if form.is_valid():
+    #         form.save()
+    return render(request, 'cinema/addashow.html', {'film': film, 'screen' : screen})
+
+def addshow(request):
+    if request.method == "POST":
+        # film = Movie.objects.all()
+        # screen = Screen.objects.all()
+        form = showingForm(request.POST, request.FILES or None)
+        if form.is_valid():
+            form.save()
+        return redirect(renshowhome)
+    else:
+        return render(request, 'cinema/addashow.html', {})
+
+
+
+
+def updateshow(request, showing_id):
+        update = Showing.objects.get(id=showing_id)
+        form = showingForm(request.POST, request.FILES or None, instance=update)
+        if form.is_valid():
+            form.save()
+            return redirect(renshowhome)
+        
+        return render(request, 'cinema/updateshow.html', {'form': form})
+
+
+
+def deleteshow(request, showing_id):
+    deleting = Showing.objects.get(id=showing_id)
+    deleting.delete()
+    return redirect(renshowhome)

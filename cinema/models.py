@@ -37,11 +37,11 @@ class Ticket(models.Model):
 
 
 class Screen(models.Model):
-    number = models.PositiveIntegerField(max_length=2)
-    capacity = models.PositiveIntegerField(max_length=2)
+    number = models.PositiveIntegerField()
+    capacity = models.PositiveIntegerField()
     
     def __str__(self):
-        return self.name
+        return self.number
 
 
 class Showing(models.Model):
@@ -51,4 +51,14 @@ class Showing(models.Model):
     time = models.TimeField()
         
     def __str__(self):
-        return f"{self.film.title} - {self.date} {self.time}"
+        return self.film, self.screen, self.date, self.time
+
+#class Time(models.Model):
+#    dates = models.ForeignKey(Date, on_delete=models.CASCADE)
+#    time = models.CharField(max_length=50)
+#
+#    def __str__(self):
+#        return self.time
+
+
+#class Capacity
