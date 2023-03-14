@@ -65,9 +65,9 @@
 
         <title>404 Error</title>
     </head>
-
-    <body><h1>UH OH, 404 ERROR!</h1></body>
-
+    <div class="error">
+        <h1 class="error">UH OH, 404 ERROR!</h1>
+    </div>
     
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -77,10 +77,13 @@
         
         <style>
             body {
-                background-image: url('/media/covers/background-image.jpg');
+                background-image: url('/static/background-image.jpg');
                 background-repeat: no-repeat;
                 background-size: cover;
                 background-attachment: fixed;
+            }
+            .error {
+                color: white;
             }
         </style>
     </body>

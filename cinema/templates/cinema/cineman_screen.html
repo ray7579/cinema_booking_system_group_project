@@ -3,23 +3,47 @@
 {% block title %}Cinema Manager{% endblock %}
 
 {% block content %}
-<h1 class="text-white"> Home Page: All the Screens </h1>
-<button onclick="window.location.href='addscreen/'" class="btn btn-secondary"> Add Screen</button>
-{% for screen in screen%}
-<p class="text-white"> Screen Number: {{ screen.number }} <br/>
-    Screen Capacity: {{ screen.capacity }} <br/>
-    <button onclick="window.location.href='updatescreen/{{ screen.id }}'" class="btn btn-outline-danger"> Update Screen</button>
-    <button onclick="window.location.href='deletescreen/{{ screen.id }}'" class="btn btn-outline-danger"> Delete Screen</button>
-    
+  <h1 class="text-white">Home Page: All the Screens</h1>
+  <button onclick="window.location.href='addscreen/'" class="btn btn-secondary">Add Screen</button>
+  
+  {% for screen in screen %}
+    <div class="screenblock">
+      <div class="screen-details">
+        <p class="text-white">Screen Number: {{ screen.number }}</p>
+        <p class="text-white">Screen Capacity: {{ screen.capacity }}</p>
+      </div>
+      <div class="screen-buttons">
+        <button onclick="window.location.href='updatescreen/{{ screen.id }}'" class="btn btn-outline-danger">Update Screen</button>
+        <button onclick="window.location.href='deletescreen/{{ screen.id }}'" class="btn btn-outline-danger">Delete Screen</button>
+      </div>
+    </div>
     <hr>
-{% endfor %}
-
-
+  {% endfor %}
 {% endblock %}
 
 <style>
   .text-white {
     color: #ffffff;
+  }
+  .screenblock {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .screen-details {
+    display: inline-block;
+    max-width: 700px;
+    text-align: left;
+  }
+  .screen-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .screen-buttons button {
+    width: 150px;
+    margin-bottom: 10px;
   }
 </style>
 
