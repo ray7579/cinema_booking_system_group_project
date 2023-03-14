@@ -4,10 +4,11 @@
 
 {% block content %}
 <h1 class="text-white"> Home Page: All the Showings </h1>
-<button onclick="window.location.href='addshow/'" class="btn btn-secondary"> Add Showing</button>
-{% for screen in screen%}
-<p class="text-white"> Film Name: {{ showing.film }} <br/>
-    Screen Number: {{ showing.screen }} <br/>
+<button onclick="window.location.href='renaddshow/'" class="btn btn-secondary"> Add Showing</button>
+{% for showing in showing %}
+<p class="text-white"> 
+    Film Name: {{ showing.film }} <br/>
+   {% comment %} Screen Number: {{ showing.screen }} <br/>  {% endcomment %}
     Showing Date: {{ showing.date }} <br/>
     Showing Time: {{ showing.time }} <br/>
     <button onclick="window.location.href='updateshow/{{ showing.id }}'" class="btn btn-outline-danger"> Update Showing</button>

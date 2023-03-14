@@ -5,14 +5,24 @@
 
 <form method="POST" enctype="multipart/form-data" action={% url 'addshow' %}>
     {% csrf_token %}
-    <input type="text" class="form-control" placeholder= "Film Name" name="film" > <br/>
+    <p>Film:</p>
+    <select name="film">
+        {% for film in film %}
+        <option value={{film.id}}>{{film.name}}
+            {% endfor %}
+            
+            <br/>
     {% csrf_token %}
-    <input type="Number" class="form-control" placeholder= "Screen Number" name="screen" > <br/>
-    {% csrf_token %}
+    <p>Screen:</p>
+    <select name="screen">
+        {% for screen in screen %}
+        <option value={{screen.id}}>{{screen.number}}
+            {% endfor %}
+            <br/>
     <input type="date" class="form-control" placeholder= "Showing Date" name="date" > <br/>
     {% csrf_token %}
     <input type="time" class="form-control" placeholder= "Showing Time" name="time" > <br/>
     {% csrf_token %}
     <p> H </p>
     <button type="submit" class="btn btn-secondary"> Add Showing </button>
-{%endblock%}
+{%endblock%}  

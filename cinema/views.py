@@ -104,15 +104,27 @@ def renshowhome(request):
     # else:
     #     return render(request, 'home.html', {'all': allFilm})
 
+def renaddshow(request):
+    film = Movie.objects.all()
+    screen = Screen.objects.all()
+    # if request.method == "POST":
+    #     form = filmForm(request.POST or None)
+    #     if form.is_valid():
+    #         form.save()
+    return render(request, 'cinema/addashow.html', {'film': film, 'screen' : screen})
 
 def addshow(request):
     if request.method == "POST":
+        # film = Movie.objects.all()
+        # screen = Screen.objects.all()
         form = showingForm(request.POST, request.FILES or None)
         if form.is_valid():
             form.save()
         return redirect(renshowhome)
     else:
         return render(request, 'cinema/addashow.html', {})
+
+
 
 
 def updateshow(request, showing_id):
