@@ -1,12 +1,19 @@
-{% extends 'cinema/base.html' %}
+{% extends 'accounts/base.html' %}
 
 {% block content %}
-    <h1 class="welcome-header">Welcome to UWEFlix</h1>
-    <button onclick="window.location.href='renfilmhome/'" class="btn btn-secondary">Cine Film</button>
-    
+    <div class="welcome-container">
+        <h1 class="welcome-header">Welcome to UWEFlix {{request.user.username}}</h1>
+    </div>
     <style>
         body {
             color: white;
+        }
+
+        .welcome-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50vh;
         }
 
         .welcome-header {

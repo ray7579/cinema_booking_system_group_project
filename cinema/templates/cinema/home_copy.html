@@ -1,26 +1,52 @@
-{% extends 'cinema/base.html' %}
+{% extends 'accounts/base.html' %}
 
-{% block title %}Cinema Manager{% endblock %}
+{% block title %}Film Managemnet{% endblock %}
 
 {% block content %}
-<h1 class="text-white"> Home Page: All the Films </h1>
-<button onclick="window.location.href='addfilm/'" class="btn btn-secondary"> Add Film</button>
-{% for movie in movie%}
-<p class="text-white"> Film Name: {{ movie.name }} <br/>
-    Film Age Rating: {{ movie.age_rating }} <br/>
-    Film Description:{{ movie.description }} <br/>
-    Film Duration:{{ movie.duration }} <br/>
-    <button onclick="window.location.href='updatefilm/{{ movie.id }}'" class="btn btn-outline-danger"> Update Film</button>
-    <button onclick="window.location.href='delete/{{ movie.id }}'" class="btn btn-outline-danger"> Delete Film</button>
-    
-    <hr>
+<h1 class="text-white">Home Page: All the Films</h1>
+<button onclick="window.location.href='addfilm/'" class="btn btn-secondary">Add Film</button>
+
+{% for movie in movie %}
+<div class="movieblock">
+  <div class="Description">
+    <p class="text-white">
+      Film Name: {{ movie.name }} <br/>
+      Film Age Rating: {{ movie.age_rating }} <br/>
+      Film Duration:{{ movie.duration }} <br/>
+      Film Description :{{ movie.description }} <br/>
+    </p>
+  </div>
+  <div class="buttons">
+    <button onclick="window.location.href='updatefilm/{{ movie.id }}'" class="btn btn-outline-danger">Update Film</button>
+    <button onclick="window.location.href='delete/{{ movie.id }}'" class="btn btn-outline-danger">Delete Film</button>
+  </div>
+</div>
 {% endfor %}
 
-
-{% endblock %}
-
 <style>
-  .text-white {
-    color: #ffffff;
+  .Description {
+    display: inline-block;
+    max-width: 700px;
+    text-align: left;
+  }
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .buttons button {
+    width: 150px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .movieblock {
+    padding-left: 200px;
+    padding-right: 200px;
+    display: flex;
+    justify-content: space-between;
+    margin-right: 20px;
   }
 </style>
+
+{% endblock %}

@@ -1,10 +1,10 @@
 from django.db import models
 
-# Create your models here.
+
 
 class Movie(models.Model):
     name = models.CharField(max_length=200)
-    description = models.CharField(null=True, max_length=500)
+    description = models.CharField(null=True, max_length=1000)
     age_rating = models.CharField(null=True, max_length=50)
     duration = models.CharField( null=True, max_length=50)
     image = models.ImageField(upload_to='covers/', null=True)
@@ -36,13 +36,22 @@ class Ticket(models.Model):
         return self.quantity, self.ticket_id
 
 
-class Screens(models.Model):
-    number = models.IntegerField() 
-    capacity = models.IntegerField()
+class Screen(models.Model):
+    number = models.PositiveIntegerField()
+    capacity = models.PositiveIntegerField()
+    
     def __str__(self):
-        return str(self.number)
+        return self.number
 
 
+class Showing(models.Model):
+    film = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    screen = models.ForeignKey(Screen, on_delete=models.CASCADE)
+    date = models.DateField()
+    time = models.TimeField()
+        
+    def __str__(self):
+        return self.film, self.screen, self.date, self.time
 
 #class Time(models.Model):
 #    dates = models.ForeignKey(Date, on_delete=models.CASCADE)

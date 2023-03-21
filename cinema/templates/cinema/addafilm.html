@@ -1,20 +1,42 @@
-{% extends 'cinema/base.html' %}
-{% block title %}Cine Man{% endblock %}
-{% block content %}
-<h1> Add Film </h1>
+{% extends 'accounts/base.html' %}
+{% block title %}Add Film{% endblock %}
 
-<form method="POST" enctype="multipart/form-data" action={% url 'addfilm' %}>
-    {% csrf_token %}
-    <input type="text" class="form-control" placeholder= "Film Name" name="name" > <br/>
-    {% csrf_token %}
-    <input type="text" class="form-control" placeholder= "Film Age" name="age_rating" > <br/>
-    {% csrf_token %}
-    <input type="text" class="form-control" placeholder= "Film Description" name="description" > <br/>
-    {% csrf_token %}
-    <input type="text" class="form-control" placeholder= "Duration" name="duration" > <br/>
-    {% csrf_token %}
-    <input type="file" class="form-control" placeholder= "Image" name="image" > <br/> <br/>
-    {% csrf_token %}
-    <p> H </p>
-    <button type="submit" class="btn btn-secondary"> Add Film </button>
-{%endblock%}
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card text-black bg-light">
+        <div class="card-header">
+          <h1>Add Film</h1>
+        </div>
+        <div class="card-body">
+          <form method="POST" enctype="multipart/form-data" action="{% url 'addfilm' %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="name">Film Name:</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="Enter film name" required>
+            </div>
+            <div class="form-group">
+              <label for="age_rating">Age Rating:</label>
+              <input type="number" class="form-control" id="age_rating" name="age_rating" placeholder="Enter age rating" required>
+            </div>
+            <div class="form-group">
+                <label for="duration">Duration:</label>
+                <input type="number" class="form-control" id="duration" name="duration" placeholder="Enter film duration" required>
+            </div>  
+            <div class="form-group">
+              <label for="description">Film Description:</label>
+              <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter film description" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="image">Image:</label>
+              <input type="file" class="form-control-file" id="image" name="image" accept="image/*" required>
+            </div>
+            <button type="submit" class="btn btn-secondary">Add Film</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
