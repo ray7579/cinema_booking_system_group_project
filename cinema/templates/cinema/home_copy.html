@@ -3,7 +3,7 @@
 {% block title %}Cinema Manager{% endblock %}
 
 {% block content %}
-<h1 class="text-white">Movie Management</h1>
+<h1 class="text-white">Home Page: All the Films</h1>
 <button onclick="window.location.href='addfilm/'" class="btn btn-secondary">Add Film</button>
 
 {% for movie in movie %}
@@ -37,6 +37,7 @@
   }
   .buttons button {
     width: 150px;
+    margin-top: 10px;
     margin-bottom: 10px;
   }
   .movieblock {
