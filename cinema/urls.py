@@ -20,5 +20,3 @@ urlpatterns=[
     path('renshowhome/deleteshow/<showing_id>', views.deleteshow, name="deleteshow"),
     path('renshowhome/', views.renshowhome, name = "renshowhome"),
 ]
-
-
