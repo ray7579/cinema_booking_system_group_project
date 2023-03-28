@@ -1,14 +1,35 @@
 {% extends 'accounts/base.html' %}
-{% block title %}Cinema Manager{% endblock %}
+{% block title %}Update Showing{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-center">
   <div class="card bg-light mb-3" style="max-width: 25rem;">
     <div class="card-header">Update Showing</div>
     <div class="card-body">
-      <form action="" enctype="multipart/form-data" method="POST">
+      {% comment %} <form action="" enctype="multipart/form-data" method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form.as_p }} {% endcomment %}
+        <form action="" method="POST" enctype="multipart/form-data">
+          {% comment %} {% csrf_token %}
+          {{ form.as_p }} {% endcomment %}
+          <p>Film:</p>
+          <select name="film">
+              {% for film in film %}
+              <option value={{film.id}}>{{film.name}}
+                  {% endfor %}
+                  
+                  <br/>
+          {% csrf_token %}
+          <p>Screen:</p>
+          <select name="screen">
+              {% for screen in screen %}
+              <option value={{screen.id}}>{{screen.number}}
+                  {% endfor %}
+                  <br/>
+          <input type="date" class="form-control" placeholder= "Showing Date" name="date" > <br/>
+          {% csrf_token %}
+          <input type="time" class="form-control" placeholder= "Showing Time" name="time" > <br/>
+          {% csrf_token %}
         <input type="submit" value="Update" class="btn btn-secondary">
       </form>
     </div>

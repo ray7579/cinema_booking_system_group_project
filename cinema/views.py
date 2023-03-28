@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpRequest
 from .models import Movie, Date, Ticket, Screen, Showing
 from .forms import filmForm, screenForm, showingForm
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models import Q
 
 
 def home(response):
@@ -62,12 +63,23 @@ def updatefilm(request, movie_id):
         return render(request, 'cinema/updatefilm.html', {'form': form})
 
 
+
 @login_required
 @permission_required("cinema.delete_movie")
 def delete(request, film_id):
     deleting = Movie.objects.get(id=film_id)
+    #shmovie = SELECT movie_name FROM movie WHERE id = <film_id>;
+    # shmovie = deleting.name
+    #moshow = SELECT * FROM Showing WHERE name LIKE '%'; ,shmovie
+    # moshow = Showing.objects.filter(film=shmovie).count
+    #if shmovie == moshow:
+    # if moshow == 0:
     deleting.delete()
-    return redirect(renfilmhome)
+    return redirect(renfilmhome)        
+    #don't delete
+    # else:
+    #     return render(request, 'home_copy.html')
+
 
 
 @login_required
@@ -144,13 +156,15 @@ def addshow(request):
 
 
 def updateshow(request, showing_id):
+        film = Movie.objects.all()
+        screen = Screen.objects.all()
         update = Showing.objects.get(id=showing_id)
         form = showingForm(request.POST, request.FILES or None, instance=update)
         if form.is_valid():
             form.save()
             return redirect(renshowhome)
         
-        return render(request, 'cinema/updateshow.html', {'form': form})
+        return render(request, 'cinema/updateshow.html', {'form': form, 'film': film, 'screen' : screen})
 
 
 

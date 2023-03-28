@@ -1,14 +1,30 @@
 {% extends 'accounts/base.html' %}
-{% block title %}Cine Man{% endblock %}
-{% block content %}
-<h1> Add Screen </h1>
+{% block title %}Add Screen{% endblock %}
 
-<form method="POST" enctype="multipart/form-data" action={% url 'addscreen' %}>
-    {% csrf_token %}
-    <input type="Number" class="form-control" placeholder= "Screen Number" name="number" > <br/>
-    {% csrf_token %}
-    <input type="Number" class="form-control" placeholder= "Screen Capacity" name="capacity" > <br/>
-    {% csrf_token %}
-    <p> H </p>
-    <button type="submit" class="btn btn-secondary"> Add Screen </button>
-{%endblock%}
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card text-black bg-light">
+        <div class="card-header">
+          <h1>Add Screen</h1>
+        </div>
+        <div class="card-body">
+          <form method="POST" enctype="multipart/form-data" action="{% url 'addscreen' %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="number">Screen Number:</label>
+              <input type="number" class="form-control" id="number" name="number" placeholder="Enter screen number" required>
+            </div>
+            <div class="form-group">
+              <label for="capacity">Screen Capacity:</label>
+              <input type="number" class="form-control" id="capacity" name="capacity" placeholder="Enter screen capacity" required>
+            </div>
+            <button type="submit" class="btn btn-secondary">Add Screen</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
