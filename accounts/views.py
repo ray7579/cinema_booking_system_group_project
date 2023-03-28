@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView
-from .models import User
-from .forms import ClubRepSignUpForm, StudentSignUpForm, CinemamanagerSignUpForm, AccountmanagerSignUpForm
-from django.contrib.auth.forms import AuthenticationForm
+from .models import User, Student, ClubRep, CinemaManager, AccountManager
+from .forms import ClubRepSignUpForm, StudentSignUpForm, CinemamanagerSignUpForm, AccountmanagerSignUpForm, userForm, StudentUpdateForm, ClubrepUpdateForm
+from django.contrib.auth.forms import AuthenticationForm, UserChangeForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.views.generic import UpdateView
 
 
 def home(request):
@@ -84,7 +85,7 @@ def login_request(request):
                 if user is not None:
                     login(request,user)
                     return redirect('/')
-                else:
+                else:   
                     messages.error(request, "Invalid username or password")
             else:
                 messages.error(request, "Invalid username or password")
@@ -94,3 +95,46 @@ def login_request(request):
 def logout_view(request):
     logout(request)
     return redirect('/')
+
+
+def accountshome(request):
+    users = User.objects.all()
+    return render(request, 'accounts/accountslist.html', {'users': users})
+   
+
+def updateuser(request, user_id):
+    user = User.objects.get(id=user_id)
+    form = userForm(request.POST or None, instance=user)
+
+    if user.is_student:
+        temp = Student.objects.get(user=user_id)
+        tempform = StudentUpdateForm(request.POST or None, instance=temp, initial={
+                'credit':temp.credit,})
+      
+
+    if user.is_clubrep:
+        temp = ClubRep.objects.get(user=user_id)
+        tempform = ClubrepUpdateForm(request.POST or None, instance=temp, initial={
+                'clubname':temp.clubname,
+                'street_no': temp.street_no,
+                'street': temp.street, 
+                'city': temp.city, 
+                'postcode': temp.postcode, 
+                'landline_no': temp.landline_no, 
+                'mobile_no': temp.mobile_no, 
+                'credit': temp.credit,})
+       
+
+    if form.is_valid() and tempform.is_valid():
+        form.save()
+        tempform.save()
+        print("saving form")
+        return redirect(accountshome)
+
+    return render(request, 'accounts/updateuser.html', {'form': form, 'tempform': tempform})
+
+
+def deleteuser(request, user_id):
+    deleting = User.objects.get(id=user_id)
+    deleting.delete()
+    return redirect(accountshome)

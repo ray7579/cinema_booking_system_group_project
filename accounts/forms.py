@@ -98,6 +98,25 @@ class AccountmanagerSignUpForm(UserCreationForm):
         return manager  
 
 
+class userForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name']
+
+class StudentUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Student
+        fields = ['credit']
+
+class ClubrepUpdateForm(forms.ModelForm):
+    class Meta:
+        model = ClubRep
+        fields = ['clubname', 'street_no', 'street', 'city', 'postcode', 'landline_no', 'mobile_no', 'credit']
+
+
+
+
+
 
 
 
