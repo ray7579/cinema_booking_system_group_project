@@ -41,7 +41,7 @@ class Screen(models.Model):
     capacity = models.PositiveIntegerField()
     
     def __str__(self):
-        return self.number
+        return str(self.number) #, str(self.capacity)
 
 
 class Showing(models.Model):
@@ -51,7 +51,7 @@ class Showing(models.Model):
     time = models.TimeField()
         
     def __str__(self):
-        return self.film, self.screen, self.date, self.time
+        return str(self.film), str(self.screen), str(self.date), str(self.time)
 
 #class Time(models.Model):
 #    dates = models.ForeignKey(Date, on_delete=models.CASCADE)
