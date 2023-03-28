@@ -8,7 +8,7 @@
 {% for showing in showing %}
 <p class="text-white"> 
     Film Name: {{ showing.film }} <br/>
-   {% comment %} Screen Number: {{ showing.screen }} <br/>  {% endcomment %}
+   Screen Number: {{ showing.screen }} <br/> 
     Showing Date: {{ showing.date }} <br/>
     Showing Time: {{ showing.time }} <br/>
     <button onclick="window.location.href='updateshow/{{ showing.id }}'" class="btn btn-outline-danger"> Update Showing</button>
