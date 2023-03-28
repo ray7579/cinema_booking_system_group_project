@@ -9,6 +9,10 @@ urlpatterns=[
     path('accountmanager_register/', views.accountmanager_register.as_view(), name='accountmanager_register'),
     path('login/', views.login_request, name='login'),
     path('logout/', views.logout_view, name='logout'),
-    path('404/', views.perm_denied, name = 'perm_blocked')
+    path('404/', views.perm_denied, name = 'perm_blocked'),
     
+    path('accountslist/', views.accountshome, name = "accountslist"),
+    path('accountslist/updateuser/<user_id>', views.updateuser, name="updateuser"),
+    path('accountslist/deleteuser/<user_id>', views.deleteuser, name="delete"),
+ 
 ]
