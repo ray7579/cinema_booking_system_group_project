@@ -1,0 +1,106 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Account Manager{% endblock %}
+
+{% block content %}
+<h1 class="text-white">Accounts Management</h1>
+<button onclick="window.location.href='addfilm/'" class="btn btn-secondary">Add Film</button>
+
+
+
+<h2 class="text-white">Superusers:</h2>
+{% for user in users %}
+      {% if user.is_superuser %}
+      <div class="movieblock">
+        <div class="Description">
+          <p class="text-white">
+      Username: {{ user.username }} <br/>
+    </p>
+  </div>
+  <div class="buttons">
+    <button onclick="window.location.href='updateuser/{{ user.id }}'" class="btn btn-outline-danger">View user</button>
+    <button onclick="window.location.href='deleteuser/{{ user.id }}'" class="btn btn-outline-danger">Delete user</button>
+  </div>
+</div>
+      {% endif %} 
+{% endfor %}
+
+
+
+<h2 class="text-white">Account Managers:</h2>
+{% for user in users %}
+      {% if user.is_accountmanager %}
+      <div class="movieblock">
+        <div class="Description">
+          <p class="text-white">
+      Username: {{ user.username }} <br/>
+    </p>
+  </div>
+  <div class="buttons">
+    <button onclick="window.location.href='updateuser/{{ user.id }}'" class="btn btn-outline-danger">View user</button>
+    <button onclick="window.location.href='deleteuser/{{ user.id }}'" class="btn btn-outline-danger">Delete user</button>
+  </div>
+</div>
+      {% endif %}
+{% endfor %}
+
+
+
+<h2 class="text-white">Cinema Managers:</h2>
+{% for user in users %}
+      {% if user.is_cinemamanager %}
+      <div class="movieblock">
+        <div class="Description">
+          <p class="text-white">
+      Username: {{ user.username }} <br/>
+    </p>
+  </div>
+  <div class="buttons">
+    <button onclick="window.location.href='updateuser/{{ user.id }}'" class="btn btn-outline-danger">View user</button>
+    <button onclick="window.location.href='deleteuser/{{ user.id }}'" class="btn btn-outline-danger">Delete user</button>
+  </div>
+</div>
+      {% endif %} 
+{% endfor %}
+
+
+
+<h2 class="text-white">Students:</h2>
+{% for user in users %}
+      {% if user.is_student %}
+      <div class="movieblock">
+        <div class="Description">
+          <p class="text-white">
+      Username: {{ user.username }} <br/>
+    </p>
+  </div>
+  <div class="buttons">
+    <button onclick="window.location.href='updateuser/{{ user.id }}'" class="btn btn-outline-danger">View user</button>
+    <button onclick="window.location.href='deleteuser/{{ user.id }}'" class="btn btn-outline-danger">Delete user</button>
+  </div>
+</div>
+      {% endif %} 
+{% endfor %}
+
+
+
+
+<h2 class="text-white">Clubrep:</h2>
+{% for user in users %}
+      {% if user.is_clubrep %}
+      <div class="movieblock">
+        <div class="Description">
+          <p class="text-white">
+      Username: {{ user.username }} <br/>
+    </p>
+  </div>
+  <div class="buttons">
+    <button onclick="window.location.href='updateuser/{{ user.id }}'" class="btn btn-outline-danger">View user</button>
+    <button onclick="window.location.href='deleteuser/{{ user.id }}'" class="btn btn-outline-danger">Delete user</button>
+  </div>
+</div>
+      {% endif %} 
+{% endfor %}
+
+
+{% endblock %}
