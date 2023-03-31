@@ -19,4 +19,6 @@ urlpatterns=[
     path('renshowhome/updateshow/<showing_id>', views.updateshow, name="updateshow"),
     path('renshowhome/deleteshow/<showing_id>', views.deleteshow, name="deleteshow"),
     path('renshowhome/', views.renshowhome, name = "renshowhome"),
+    path('config/', views.stripe_config),
+    path('create-checkout-session/', views.create_checkout_session),
 ]
