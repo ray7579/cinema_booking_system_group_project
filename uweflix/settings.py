@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'cinema',
+    'ticket_booking',
 ]
 
 MIDDLEWARE = [
