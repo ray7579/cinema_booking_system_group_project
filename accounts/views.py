@@ -98,9 +98,9 @@ def logout_view(request):
 
 
 def accountshome(request):
-    users = User.objects.all()
+    users = User.objects.order_by('username')
     return render(request, 'accounts/accountslist.html', {'users': users})
-   
+
 
 def updateuser(request, user_id):
     user = User.objects.get(id=user_id)
