@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView
 from .models import User, Student, ClubRep, CinemaManager, AccountManager
-from .forms import ClubRepSignUpForm, StudentSignUpForm, CinemamanagerSignUpForm, AccountmanagerSignUpForm, userForm, StudentUpdateForm, ClubrepUpdateForm
+from .forms import ClubRepSignUpForm, StudentSignUpForm, CinemamanagerSignUpForm, AccountmanagerSignUpForm, userForm, StudentUpdateForm, ClubrepUpdateForm, AccountmanagerUpdateForm, CinemamanagerUpdateForm
 from django.contrib.auth.forms import AuthenticationForm, UserChangeForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -123,7 +123,23 @@ def updateuser(request, user_id):
                 'landline_no': temp.landline_no, 
                 'mobile_no': temp.mobile_no, 
                 'credit': temp.credit,})
-       
+        
+    if user.is_accountmanager or user.is_cinemamanager:
+        tempform = None
+
+    if user.is_accountmanager:
+        temp = AccountManager.objects.get(user=user_id)
+        tempform = AccountmanagerUpdateForm(request.POST or None, instance=temp, initial={
+
+                })
+    if user.is_cinemamanager:
+        temp = CinemaManager.objects.get(user=user_id)
+        tempform = CinemamanagerUpdateForm(request.POST or None, instance=temp, initial={
+
+                })
+
+
+      
 
     if form.is_valid() and tempform.is_valid():
         form.save()

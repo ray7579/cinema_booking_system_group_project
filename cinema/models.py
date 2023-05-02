@@ -59,6 +59,3 @@ class Showing(models.Model):
 #
 #    def __str__(self):
 #        return self.time
-
-
-#class Capacity
