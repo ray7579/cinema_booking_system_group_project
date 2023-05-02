@@ -116,9 +116,7 @@ def updatescreen(request, screen_id):
 
 @login_required
 def deletescreen(request, screen_id):
-    # deleting = Screen.objects.get(id=screen_id)
-    # deleting.delete()
-    # return redirect(renscreenhome)
+
     deleting = get_object_or_404(Screen, id=screen_id)
     showing = Showing.objects.filter(screen=deleting)
     if showing.exists():
