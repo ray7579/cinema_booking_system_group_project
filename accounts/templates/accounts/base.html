@@ -47,6 +47,13 @@
                 background-attachment: fixed;
                 background-position: center;
             }
+            .hoverable-dropdown:hover > .dropdown-menu {
+                display: block;
+                margin-top: 0;
+            }
+            .hoverable-dropdown .dropdown-item {
+                color: rgb(0, 0, 0);
+            }
         </style>
         
         <!-- Required meta tags -->
@@ -58,6 +65,24 @@
          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
         <title>{% block title %} UWEFlix {% endblock %}</title>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              const hoverableDropdowns = document.querySelectorAll('.hoverable-dropdown');
+          
+              hoverableDropdowns.forEach(function(dropdown) {
+                dropdown.addEventListener('mouseover', function() {
+                  this.classList.add('show');
+                  this.querySelector('.dropdown-menu').classList.add('show');
+                });
+          
+                dropdown.addEventListener('mouseout', function() {
+                  this.classList.remove('show');
+                  this.querySelector('.dropdown-menu').classList.remove('show');
+                });
+              });
+            });
+        </script>
     </head>
 
     <body>
@@ -80,20 +105,24 @@
                         <a class="nav-link" href="/movies">Movies</a>
                     </li>
                     {% if user.is_cinemamanager %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/renfilmhome">Manage Movies</a>
+                    <li class="nav-item dropdown hoverable-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="manageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Manage
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="manageDropdown">
+                          <li><a class="dropdown-item" href="/renfilmhome">Manage Movies</a></li>
+                          <li><a class="dropdown-item" href="/renscreenhome">Manage Screens</a></li>
+                          <li><a class="dropdown-item" href="/renshowhome">Manage Shows</a></li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/renscreenhome">Manage Screens</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/renshowhome">Manage Shows</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/student_register">Register Student</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="/clubrep_register">Register Clubrep</a>
+                    <li class="nav-item dropdown hoverable-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="manageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Register
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="manageDropdown">
+                            <li><a class="dropdown-item" href="/student_register">Register Student</a></li>
+                            <li><a class="dropdown-item" href="/clubrep_register">Register Clubrep</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/accountslist">Edit Accounts</a>
@@ -111,29 +140,29 @@
                     </li>
                     {% endif %}
                     {% if user.is_superuser %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/renfilmhome">Manage Movies</a>
+                    <li class="nav-item dropdown hoverable-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="manageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Manage
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="manageDropdown">
+                          <li><a class="dropdown-item" href="/renfilmhome">Manage Movies</a></li>
+                          <li><a class="dropdown-item" href="/renscreenhome">Manage Screens</a></li>
+                          <li><a class="dropdown-item" href="/renshowhome">Manage Shows</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown hoverable-dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="manageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Register
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="manageDropdown">
+                            <li><a class="dropdown-item" href="/student_register">Register Student</a></li>
+                            <li><a class="dropdown-item" href="/clubrep_register">Register Clubrep</a></li>
+                            <li><a class="dropdown-item" href="/cinemamanager_register">Register CinemaManager</a></li>
+                            <li><a class="dropdown-item" href="/accountmanager_register">Register AccountManager</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/renscreenhome">Manage Screens</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/renshowhome">Manage Shows</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/student_register">Register Student</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="/clubrep_register">Register Clubrep</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/edit_profile">Edit Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/cinemamanager_register">Register CinemaManager</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/accountmanager_register">Register AccountManager</a>
+                        <a class="nav-link" href="/accountslist">Edit Accounts</a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
