@@ -114,7 +114,16 @@ class ClubrepUpdateForm(forms.ModelForm):
         fields = ['clubname', 'street_no', 'street', 'city', 'postcode', 'landline_no', 'mobile_no', 'credit']
 
 
+class AccountmanagerUpdateForm(forms.ModelForm):
+    class Meta:
+        model = AccountManager
+        fields = '__all__'
+      
 
+class CinemamanagerUpdateForm(forms.ModelForm):
+    class Meta:
+        model = CinemaManager
+        fields = '__all__'
 
 
 
