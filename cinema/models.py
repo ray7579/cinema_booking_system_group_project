@@ -1,12 +1,13 @@
 from django.db import models
+from django.core.validators import MaxValueValidator
 
 
 
 class Movie(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     description = models.CharField(null=True, max_length=1000)
-    age_rating = models.CharField(null=True, max_length=50)
-    duration = models.CharField( null=True, max_length=50)
+    age_rating = models.IntegerField(null=True, validators=[MaxValueValidator(18)])
+    duration = models.IntegerField( null=True, validators=[MaxValueValidator(240)])
     image = models.ImageField(upload_to='covers/', null=True)
 
     def __str__(self):
@@ -37,21 +38,27 @@ class Ticket(models.Model):
 
 
 class Screen(models.Model):
-    number = models.PositiveIntegerField()
-    capacity = models.PositiveIntegerField()
+    number = models.PositiveIntegerField(unique=True)
+    capacity = models.PositiveIntegerField(validators=[MaxValueValidator(300)])
     
     def __str__(self):
         return str(self.number) #, str(self.capacity)
 
 
 class Showing(models.Model):
-    film = models.ForeignKey(Movie, on_delete=models.CASCADE)
-    screen = models.ForeignKey(Screen, on_delete=models.CASCADE)
+    film = models.ForeignKey(Movie, on_delete=models.PROTECT)
+    screen = models.ForeignKey(Screen, on_delete=models.PROTECT)
     date = models.DateField()
     time = models.TimeField()
+    covid = models.BooleanField(default=False)
         
     def __str__(self):
         return str(self.film), str(self.screen), str(self.date), str(self.time)
+
+class Seats(models.Model):
+    row = models.CharField(max_length=1)
+    seatno = models.IntegerField(validators=[MaxValueValidator(10)])
+    screen = models.ForeignKey(Screen, on_delete=models.CASCADE)
 
 #class Time(models.Model):
 #    dates = models.ForeignKey(Date, on_delete=models.CASCADE)

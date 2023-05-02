@@ -30,6 +30,9 @@
           {% csrf_token %}
           <input type="time" class="form-control" placeholder= "Showing Time" name="time" > <br/>
           {% csrf_token %}
+          <p> Social Distancing Enabled: </p>
+         <input type="checkbox" class="form-control" name="covid" value="true"> <br/>
+         {% csrf_token %}
         <input type="submit" value="Update" class="btn btn-secondary">
       </form>
     </div>

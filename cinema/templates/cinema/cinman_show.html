@@ -3,25 +3,55 @@
 {% block title %}Showing Management{% endblock %}
 
 {% block content %}
-<h1 class="text-white"> Home Page: All the Showings </h1>
-<button onclick="window.location.href='renaddshow/'" class="btn btn-secondary"> Add Showing</button>
+<div class="head">
+  <h1 class="text-white"> Home Page: All the Showings </h1>
+  <button onclick="window.location.href='renaddshow/'" class="btn btn-secondary"> Add Showing</button>
+</div>
+
 {% for showing in showing %}
-<p class="text-white"> 
-    Film Name: {{ showing.film }} <br/>
-   Screen Number: {{ showing.screen }} <br/> 
-    Showing Date: {{ showing.date }} <br/>
-    Showing Time: {{ showing.time }} <br/>
+<div class = "showblocks">
+  <div class ="show-details">
+    <div class="text-white">
+      Film Name: {{ showing.film }} <br/>
+      Screen Number: {{ showing.screen }} <br/> 
+      Showing Date: {{ showing.date }} <br/>
+      Showing Time: {{ showing.time }} <br/>
+      Social Distancing: {{showing.covid }} <br/>
+    </div>
+  </div>
+  <div class="buttons">
     <button onclick="window.location.href='updateshow/{{ showing.id }}'" class="btn btn-outline-danger"> Update Showing</button>
     <button onclick="window.location.href='deleteshow/{{ showing.id }}'" class="btn btn-outline-danger"> Delete Showing</button>
-    
-    <hr>
+  </div>
+</div>
+
 {% endfor %}
 
-
-{% endblock %}
-
 <style>
-  .text-white {
-    color: #ffffff;
+  .head{
+    padding-bottom: 10px;
+  }
+  .show-details {
+    text-align: left;
+  }
+  .buttons {
+    display: flex;
+    flex-direction: column;
+  }
+  .buttons button {
+    width: 150px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  .showblocks {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    padding: 10px;
+    gap: 1rem;
   }
 </style>
+
+{% endblock %}

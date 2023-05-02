@@ -1,28 +1,48 @@
 {% extends 'accounts/base.html' %}
 {% block title %}Add Show{% endblock %}
-{% block content %}
-<h1> Add Showing </h1>
 
-<form method="POST" enctype="multipart/form-data" action={% url 'addshow' %}>
-    {% csrf_token %}
-    <p>Film:</p>
-    <select name="film">
-        {% for film in film %}
-        <option value={{film.id}}>{{film.name}}
-            {% endfor %}
-            
-            <br/>
-    {% csrf_token %}
-    <p>Screen:</p>
-    <select name="screen">
-        {% for screen in screen %}
-        <option value={{screen.id}}>{{screen.number}}
-            {% endfor %}
-            <br/>
-    <input type="date" class="form-control" placeholder= "Showing Date" name="date" > <br/>
-    {% csrf_token %}
-    <input type="time" class="form-control" placeholder= "Showing Time" name="time" > <br/>
-    {% csrf_token %}
-    <p> H </p>
-    <button type="submit" class="btn btn-secondary"> Add Showing </button>
-{%endblock%}  
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card text-black bg-light">
+        <div class="card-header">
+          <h1>Add Showing</h1>
+        </div>
+        <div class="card-body">
+          <form method="POST" enctype="multipart/form-data" action="{% url 'addshow' %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="film">Film:</label>
+              <select name="film" id="film" class="form-control">
+                {% for film in film %}
+                <option value="{{film.id}}">{{film.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="screen">Screen:</label>
+              <select name="screen" id="screen" class="form-control">
+                {% for screen in screen %}
+                <option value="{{screen.id}}">{{screen.number}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="date">Showing Date:</label>
+              <input type="date" class="form-control" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+              <label for="time">Showing Time:</label>
+              <input type="time" class="form-control" id="time" name="time" required>
+              <p> Social Distancing Enabled: </p>
+              <input type="checkbox" class="form-control" name="covid" value=True> <br/>
+            </div>
+            <button type="submit" class="btn btn-secondary">Add Showing</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
