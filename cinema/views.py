@@ -55,13 +55,15 @@ def addfilm(request):
 @login_required
 @permission_required("cinema.change_movie")
 def updatefilm(request, movie_id):
-        update = Movie.objects.get(id=movie_id)
-        form = filmForm(request.POST, request.FILES or None, instance=update)
+    movie = get_object_or_404(Movie, id=movie_id)
+    if request.method == 'POST':
+        form = filmForm(request.POST, request.FILES, instance=movie)
         if form.is_valid():
             form.save()
-            return redirect(renfilmhome)
-        
-        return render(request, 'cinema/updatefilm.html', {'form': form})
+            return redirect('renfilmhome')
+    else:
+        form = filmForm(instance=movie)
+    return render(request, 'cinema/updatefilm.html', {'form': form, 'movie': movie})
 
 
 
@@ -105,13 +107,13 @@ def addscreen(request):
 
 @login_required
 def updatescreen(request, screen_id):
-        update = Screen.objects.get(id=screen_id)
-        form = screenForm(request.POST, request.FILES or None, instance=update)
+        screen = get_object_or_404(Screen, id=screen_id)
+        form = screenForm(request.POST or None, instance=screen)
         if form.is_valid():
             form.save()
             return redirect(renscreenhome)
         
-        return render(request, 'cinema/updatescreen.html', {'form': form})
+        return render(request, 'cinema/updatescreen.html', {'form': form, 'screen': screen})
 
 
 @login_required
