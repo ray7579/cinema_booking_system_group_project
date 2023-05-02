@@ -21,6 +21,7 @@ def ticket_booking_view(request):
         form = TicketBookingForm(request.POST)
         if form.is_valid():
             # Check screen capacity
+            print("valid-----------")
             ticket_quantity = form.cleaned_data['ticket_quantity']
             if ticket_quantity > 80:
                 return render(request, 'ticket_booking/booking_error.html', {'error_message': 'Screen capacity is 80. Please reduce the number of tickets.'})
