@@ -4,6 +4,7 @@ from .models import Movie, Date, Ticket, Screen, Showing
 from .forms import filmForm, screenForm, showingForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
+# from django.core.exceptions import ProtectedError
 
 
 def home(response):
@@ -67,18 +68,15 @@ def updatefilm(request, movie_id):
 @login_required
 @permission_required("cinema.delete_movie")
 def delete(request, film_id):
-    deleting = Movie.objects.get(id=film_id)
-    #shmovie = SELECT movie_name FROM movie WHERE id = <film_id>;
-    # shmovie = deleting.name
-    #moshow = SELECT * FROM Showing WHERE name LIKE '%'; ,shmovie
-    # moshow = Showing.objects.filter(film=shmovie).count
-    #if shmovie == moshow:
-    # if moshow == 0:
-    deleting.delete()
-    return redirect(renfilmhome)        
-    #don't delete
-    # else:
-    #     return render(request, 'home_copy.html')
+
+    deleting = get_object_or_404(Movie, id=film_id)
+    showing = Showing.objects.filter(film=deleting)
+    if showing.exists():
+        return redirect(list_movies)
+    else:
+        deleting.delete()
+        return redirect(renfilmhome)
+
 
 
 
@@ -118,9 +116,14 @@ def updatescreen(request, screen_id):
 
 @login_required
 def deletescreen(request, screen_id):
-    deleting = Screen.objects.get(id=screen_id)
-    deleting.delete()
-    return redirect(renscreenhome)
+
+    deleting = get_object_or_404(Screen, id=screen_id)
+    showing = Showing.objects.filter(screen=deleting)
+    if showing.exists():
+        return redirect(list_movies)
+    else:
+        deleting.delete()
+        return redirect(renscreenhome)
 
 def renshowhome(request):
     showing = Showing.objects.all()
