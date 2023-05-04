@@ -127,6 +127,7 @@ def deletescreen(request, screen_id):
         deleting.delete()
         return redirect(renscreenhome)
 
+@login_required
 def renshowhome(request):
     showing = Showing.objects.all()
     # if request.method == "POST":
@@ -137,6 +138,7 @@ def renshowhome(request):
     # else:
     #     return render(request, 'home.html', {'all': allFilm})
 
+@login_required
 def renaddshow(request):
     film = Movie.objects.all()
     screen = Screen.objects.all()
@@ -146,6 +148,7 @@ def renaddshow(request):
     #         form.save()
     return render(request, 'cinema/addashow.html', {'film': film, 'screen' : screen})
 
+@login_required
 def addshow(request):
     if request.method == "POST":
         # film = Movie.objects.all()
@@ -157,9 +160,7 @@ def addshow(request):
     else:
         return render(request, 'cinema/addashow.html', {})
 
-
-
-
+@login_required
 def updateshow(request, showing_id):
         film = Movie.objects.all()
         screen = Screen.objects.all()
@@ -171,8 +172,7 @@ def updateshow(request, showing_id):
         
         return render(request, 'cinema/updateshow.html', {'form': form, 'film': film, 'screen' : screen})
 
-
-
+@login_required
 def deleteshow(request, showing_id):
     deleting = Showing.objects.get(id=showing_id)
     deleting.delete()

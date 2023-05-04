@@ -96,12 +96,12 @@ def logout_view(request):
     logout(request)
     return redirect('/')
 
-
+@login_required
 def accountshome(request):
     users = User.objects.order_by('username')
     return render(request, 'accounts/accountslist.html', {'users': users})
 
-
+@login_required
 def updateuser(request, user_id):
     user = User.objects.get(id=user_id)
     form = userForm(request.POST or None, instance=user)
@@ -149,7 +149,7 @@ def updateuser(request, user_id):
 
     return render(request, 'accounts/updateuser.html', {'form': form, 'tempform': tempform})
 
-
+@login_required
 def deleteuser(request, user_id):
     deleting = User.objects.get(id=user_id)
     deleting.delete()
