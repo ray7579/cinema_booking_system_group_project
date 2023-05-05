@@ -1,0 +1,72 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+  <h2>Book Showing for {{ showing.film.name }}</h2>
+  <h4>Date: {{ showing.date }} - Time: {{ showing.time }} - Screen: {{ showing.screen.number }}</h4>
+  <form method="post" id="bookingForm">
+    {% csrf_token %}
+    {{ form.email.label_tag }}: {{ form.email }}
+    <br>
+    {% for ticket_type, elements in form_elements.items %}
+        {{ elements.label }}:
+        <button type="button" class="minus-button" data-ticket-type="{{ ticket_type }}">-</button>
+        {{ elements.field }}
+
+        <button type="button" class="plus-button" data-ticket-type="{{ ticket_type }}">+</button>
+        <br>
+    {% endfor %}
+    <div>Total Price: <span id="totalPrice">0.00</span></div>
+    <br>
+    <button type="submit">Book Now</button>
+  </form>
+
+
+
+
+
+
+  <script>
+    const form = document.getElementById('bookingForm');
+    const totalPriceElement = document.getElementById('totalPrice');
+    const minusButtons = document.querySelectorAll('.minus-button');
+    const plusButtons = document.querySelectorAll('.plus-button');
+    const ticketPrices = {
+        child: parseFloat("{{ ticket_prices.child }}"),
+        student: parseFloat("{{ ticket_prices.student }}"),
+        adult: parseFloat("{{ ticket_prices.adult }}"),
+    };
+
+    minusButtons.forEach(button => {
+    button.addEventListener('click', event => {
+        const ticketType = event.target.dataset.ticketType;
+        const input = form.elements[ticketType + '_tickets'];
+        if (input.value > 0) {
+        input.value -= 1;
+        }
+        updateTotalPrice();
+    });
+    });
+
+    plusButtons.forEach(button => {
+    button.addEventListener('click', event => {
+        const ticketType = event.target.dataset.ticketType;
+        const input = form.elements[ticketType + '_tickets'];
+        input.value = parseInt(input.value) + 1;
+        updateTotalPrice();
+    });
+    });
+
+    function updateTotalPrice() {
+    let totalPrice = 0;
+    for (const ticketType of ['child', 'student', 'adult']) {
+        const input = form.elements[ticketType + '_tickets'];
+        totalPrice += input.value * ticketPrices[ticketType];
+    }
+    totalPriceElement.innerText = totalPrice.toFixed(2);
+    }
+
+    // Update the total price initially
+    updateTotalPrice();
+
+  </script>
+{% endblock %}
