@@ -58,7 +58,7 @@
             <li class="showtime-item">{{ date.date }} {{ date.time }}</li>
             {% endfor %}
         </ul>
-        <form action="{% url 'confirm_movie' movie.id %}">
+        <form action="{% url 'showings_list' movie.id %}">
             <button class="book-button">Book Now</button>
         </form>
     </div>

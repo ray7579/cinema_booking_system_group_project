@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'cinema',
-    'ticket_booking',
 ]
 
 MIDDLEWARE = [
@@ -152,5 +151,5 @@ LOGIN_URL = 'login'
 
 
 
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51Mo8sWIX1naRcdLHbe2PdgmId9f9W1fIKqJGS7O7QZQR8X3ijkC2IsDLfAk94sqJOJtmHXAADf4YEht6ZZ111Whe009WfUuZAW'
+STRIPE_PUBLIC_KEY = 'pk_test_51Mo8sWIX1naRcdLHbe2PdgmId9f9W1fIKqJGS7O7QZQR8X3ijkC2IsDLfAk94sqJOJtmHXAADf4YEht6ZZ111Whe009WfUuZAW'
 STRIPE_SECRET_KEY = 'sk_test_51Mo8sWIX1naRcdLHwWCVnyMYWId4cEotVvrTrxitm6QyXF7dhYKXRWVAYHATvvJRYJkqN73X87nXtv4djfWcZSan001CE5pamN'
