@@ -1,0 +1,13 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+    <h1>Booking Confirmation</h1>
+    <p>Your booking for {{ booking.showing.film }} at {{ booking.showing.time }} has been confirmed.</p>
+    <p>You have booked:</p>
+    <ul>
+        <li>{{ booking.child_tickets }} Child Tickets</li>
+        <li>{{ booking.student_tickets }} Student Tickets</li>
+        <li>{{ booking.adult_tickets }} Adult Tickets</li>
+    </ul>
+    <p>Total price: {{ booking.total_price }}</p>
+{% endblock %}

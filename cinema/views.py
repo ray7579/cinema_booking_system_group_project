@@ -1,10 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpRequest
-from .models import Movie, Date, Ticket, Screen, Showing
-from .forms import filmForm, screenForm, showingForm
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from .models import Movie, Screen, Showing, TicketPrice
+from .forms import filmForm, screenForm, showingForm, BookingForm, Booking
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 # from django.core.exceptions import ProtectedError
+import messages
+from django.urls import reverse
+from django.core.exceptions import ValidationError
+
+
 
 
 def home(response):
@@ -25,6 +30,72 @@ def show_movie(response, movie_id):
 def confirm_movie(response,movie_id):
     movie = Movie.objects.get(pk=movie_id)
     return render(response, 'cinema/confirmation.html',{'movie':movie})
+
+
+def showings_list(request, movie_id):
+    movie = get_object_or_404(Movie, pk=movie_id)
+    showings = Showing.objects.filter(film=movie)
+    return render(request, 'cinema/showings_list.html', {'movie': movie, 'showings': showings})
+
+
+def calculate_total_price(booking, ticket_prices):
+    total_price = 0
+    total_price += booking.child_tickets * ticket_prices.child
+    total_price += booking.student_tickets * ticket_prices.student
+    total_price += booking.adult_tickets * ticket_prices.adult
+    return total_price
+
+def book_showing(request, showing_id):
+    showing = get_object_or_404(Showing, pk=showing_id)
+    ticket_prices = TicketPrice.objects.first()
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.showing = showing
+            #calculate the total price and assign it to the booking
+            booking.total_price = calculate_total_price(booking, ticket_prices)
+
+            #check if there are enough tickets available
+            available_tickets = showing.screen.capacity - showing.tickets_sold
+            if booking.child_tickets + booking.student_tickets + booking.adult_tickets > available_tickets:
+                raise ValidationError('Not enough tickets available')
+            
+            #update the tickets_sold attribute of the showing
+            showing.tickets_sold += booking.child_tickets + booking.student_tickets + booking.adult_tickets
+            showing.save()
+            booking.save()
+            return redirect('booking_success', booking_id=booking.id)
+    else:
+        form = BookingForm()
+
+    form_elements = {
+        ticket_type: {
+            'label': form[ticket_type + '_tickets'].label_tag,
+            'field': form[ticket_type + '_tickets'],
+            'initial': form.initial.get(ticket_type + '_tickets', 0),
+        }
+        for ticket_type in ['child', 'student', 'adult']
+    }
+
+    context = {
+        'showing': showing,
+        'form': form,
+        'form_elements': form_elements,
+        'ticket_prices': ticket_prices,
+    }
+    return render(request, 'cinema/book_showing.html', context)
+
+
+
+def booking_success(request, booking_id):
+    booking = get_object_or_404(Booking, pk=booking_id)
+    return render(request, 'cinema/booking_success.html', {'booking': booking})
+
+
+
+
+
 
 
 @login_required

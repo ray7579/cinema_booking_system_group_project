@@ -1,0 +1,13 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+  <h2>Showings for {{ movie.name }}</h2>
+  <ul>
+    {% for showing in showings %}
+      <li>
+        {{ showing.date }} - {{ showing.time }} - Screen {{ showing.screen.number }}
+        <a href="{% url 'book_showing' showing_id=showing.pk %}">Book now</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
