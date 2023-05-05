@@ -8,8 +8,13 @@ from django.db.models import Q
 import messages
 from django.urls import reverse
 from django.core.exceptions import ValidationError
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import stripe
+from django.conf import settings
+from django.shortcuts import render, redirect
 
-
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 def home(response):
@@ -53,19 +58,50 @@ def book_showing(request, showing_id):
         if form.is_valid():
             booking = form.save(commit=False)
             booking.showing = showing
-            #calculate the total price and assign it to the booking
+
+            # Calculate the total price and assign it to the booking
             booking.total_price = calculate_total_price(booking, ticket_prices)
 
-            #check if there are enough tickets available
+            # Check if there are enough tickets available
             available_tickets = showing.screen.capacity - showing.tickets_sold
             if booking.child_tickets + booking.student_tickets + booking.adult_tickets > available_tickets:
                 raise ValidationError('Not enough tickets available')
-            
-            #update the tickets_sold attribute of the showing
-            showing.tickets_sold += booking.child_tickets + booking.student_tickets + booking.adult_tickets
-            showing.save()
-            booking.save()
-            return redirect('booking_success', booking_id=booking.id)
+
+            # Create a Stripe charge
+            token = request.POST.get('stripeToken')
+            amount = int(booking.total_price * 100)  # Convert total price to cents
+            try:
+                charge = stripe.Charge.create(
+                    amount=amount,
+                    currency='usd',
+                    description='Cinema Ticket Booking',
+                    source=token,
+                )
+
+                # Update the tickets_sold attribute of the showing
+                showing.tickets_sold += booking.child_tickets + booking.student_tickets + booking.adult_tickets
+                showing.save()
+                booking.save()
+
+                return redirect('booking_success', booking_id=booking.id)
+
+            except stripe.error.CardError as e:
+                # Handle declined payment
+                body = e.json_body
+                err = body.get('error', {})
+                error_message = f"Payment declined: {err.get('message')}"
+                return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
+
+            except stripe.error.StripeError as e:
+                # Handle other Stripe errors
+                error_message = "An error occurred while processing your payment. Please try again."
+                return render(request, 'cinema/book_showing.html', {'error_message': error_message})
+
+            except Exception as e:
+                # Handle any other exceptions
+                error_message = "An unexpected error occurred. Please try again."
+                return render(request, 'cinema/book_showing.html', {'error_message': error_message})
+
     else:
         form = BookingForm()
 
@@ -83,6 +119,7 @@ def book_showing(request, showing_id):
         'form': form,
         'form_elements': form_elements,
         'ticket_prices': ticket_prices,
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
     }
     return render(request, 'cinema/book_showing.html', context)
 
