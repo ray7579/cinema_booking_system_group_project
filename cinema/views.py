@@ -5,14 +5,14 @@ from .forms import filmForm, screenForm, showingForm, BookingForm, Booking
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 # from django.core.exceptions import ProtectedError
-import messages
 from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import stripe
 from django.conf import settings
 from django.shortcuts import render, redirect
+import messages
+import stripe
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -73,7 +73,7 @@ def book_showing(request, showing_id):
             try:
                 charge = stripe.Charge.create(
                     amount=amount,
-                    currency='usd',
+                    currency='gbp',
                     description='Cinema Ticket Booking',
                     source=token,
                 )
@@ -124,15 +124,9 @@ def book_showing(request, showing_id):
     return render(request, 'cinema/book_showing.html', context)
 
 
-
 def booking_success(request, booking_id):
     booking = get_object_or_404(Booking, pk=booking_id)
     return render(request, 'cinema/booking_success.html', {'booking': booking})
-
-
-
-
-
 
 
 @login_required
@@ -191,6 +185,7 @@ def delete(request, film_id):
 
 
 @login_required
+@permission_required("cinema.change_movie")   
 def renscreenhome(request):
     screen = Screen.objects.all()
     # if request.method == "POST":
@@ -203,6 +198,7 @@ def renscreenhome(request):
 
 
 @login_required
+@permission_required("cinema.change_movie")   
 def addscreen(request):
     if request.method == "POST":
         form = screenForm(request.POST, request.FILES or None)
@@ -214,6 +210,7 @@ def addscreen(request):
 
 
 @login_required
+@permission_required("cinema.change_movie")   
 def updatescreen(request, screen_id):
         screen = get_object_or_404(Screen, id=screen_id)
         form = screenForm(request.POST or None, instance=screen)
@@ -225,6 +222,7 @@ def updatescreen(request, screen_id):
 
 
 @login_required
+@permission_required("cinema.change_movie")   
 def deletescreen(request, screen_id):
 
     deleting = get_object_or_404(Screen, id=screen_id)
@@ -236,6 +234,7 @@ def deletescreen(request, screen_id):
         return redirect(renscreenhome)
 
 @login_required
+@permission_required("cinema.change_movie")   
 def renshowhome(request):
     showing = Showing.objects.all()
     # if request.method == "POST":
@@ -247,6 +246,7 @@ def renshowhome(request):
     #     return render(request, 'home.html', {'all': allFilm})
 
 @login_required
+@permission_required("cinema.change_movie")   
 def renaddshow(request):
     film = Movie.objects.all()
     screen = Screen.objects.all()
@@ -257,6 +257,7 @@ def renaddshow(request):
     return render(request, 'cinema/addashow.html', {'film': film, 'screen' : screen})
 
 @login_required
+@permission_required("cinema.change_movie")   
 def addshow(request):
     if request.method == "POST":
         # film = Movie.objects.all()
@@ -269,6 +270,7 @@ def addshow(request):
         return render(request, 'cinema/addashow.html', {})
 
 @login_required
+@permission_required("cinema.change_movie")   
 def updateshow(request, showing_id):
         film = Movie.objects.all()
         screen = Screen.objects.all()
@@ -281,6 +283,7 @@ def updateshow(request, showing_id):
         return render(request, 'cinema/updateshow.html', {'form': form, 'film': film, 'screen' : screen})
 
 @login_required
+@permission_required("cinema.change_movie")   
 def deleteshow(request, showing_id):
     deleting = Showing.objects.get(id=showing_id)
     deleting.delete()
