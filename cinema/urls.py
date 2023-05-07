@@ -23,8 +23,6 @@ urlpatterns=[
     path('renshowhome/updateshow/<showing_id>', views.updateshow, name="updateshow"),
     path('renshowhome/deleteshow/<showing_id>', views.deleteshow, name="deleteshow"),
     path('renshowhome/', views.renshowhome, name = "renshowhome"),
-    path('book_showing/<int:showing_id>/charge', views.charge, name='charge'),
-
 ]
 
 

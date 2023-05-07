@@ -3,17 +3,13 @@ from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from .models import Movie, Screen, Showing, TicketPrice
 from .forms import filmForm, screenForm, showingForm, BookingForm, Booking
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Q
-# from django.core.exceptions import ProtectedError
-import messages
-from django.urls import reverse
-from django.core.exceptions import ValidationError
-import stripe
-from uweflix import settings
 
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
+@csrf_exempt
+def stripe_config(request):
+    if request.method == 'GET':
+        stripe_config = {'publicKey': settings.STRIPE_PUBLISHABLE_KEY}
+        return JsonResponse(stripe_config, safe=False)
 
 def home(response):
     user = response.user
