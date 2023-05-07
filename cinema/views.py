@@ -11,6 +11,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.shortcuts import render, redirect
+from django.utils import timezone
+from datetime import timedelta, datetime
 import messages
 import stripe
 
@@ -39,7 +41,8 @@ def confirm_movie(response,movie_id):
 
 def showings_list(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
-    showings = Showing.objects.filter(film=movie)
+    current_datetime = timezone.now()
+    showings = Showing.objects.filter(film=movie, date__gte=current_datetime.date(), time__gte=current_datetime.time()).order_by('date', 'time')
     return render(request, 'cinema/showings_list.html', {'movie': movie, 'showings': showings})
 
 
@@ -52,6 +55,14 @@ def calculate_total_price(booking, ticket_prices):
 
 def book_showing(request, showing_id):
     showing = get_object_or_404(Showing, pk=showing_id)
+    current_datetime = timezone.now()
+    showing_datetime = datetime.combine(showing.date, showing.time, tzinfo=current_datetime.tzinfo)
+    one_minute_before_showing = showing_datetime - timedelta(minutes=1)
+
+    if current_datetime >= one_minute_before_showing:
+        error_message = 'Booking is not allowed within 1 minute of the showtime'
+        return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
+
     ticket_prices = TicketPrice.objects.first()
     if request.method == 'POST':
         form = BookingForm(request.POST)
@@ -65,7 +76,8 @@ def book_showing(request, showing_id):
             # Check if there are enough tickets available
             available_tickets = showing.screen.capacity - showing.tickets_sold
             if booking.child_tickets + booking.student_tickets + booking.adult_tickets > available_tickets:
-                raise ValidationError('Not enough tickets available')
+                error_message = 'Not enough tickets available'
+                return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
 
             # Create a Stripe charge
             token = request.POST.get('stripeToken')
@@ -101,7 +113,6 @@ def book_showing(request, showing_id):
                 # Handle any other exceptions
                 error_message = "An unexpected error occurred. Please try again."
                 return render(request, 'cinema/book_showing.html', {'error_message': error_message})
-
     else:
         form = BookingForm()
 
@@ -133,13 +144,7 @@ def booking_success(request, booking_id):
 @permission_required("cinema.change_movie")   
 def renfilmhome(request):
     movie = Movie.objects.all()
-    # if request.method == "POST":
-    #     form = filmForm(request.POST or None)
-    #     if form.is_valid():
-    #         form.save()
     return render(request, 'cinema/home_copy.html', {'movie': movie})
-    # else:
-    #     return render(request, 'home.html', {'all': allFilm})
 
 
 @login_required
@@ -168,7 +173,6 @@ def updatefilm(request, movie_id):
     return render(request, 'cinema/updatefilm.html', {'form': form, 'movie': movie})
 
 
-
 @login_required
 @permission_required("cinema.delete_movie")
 def delete(request, film_id):
@@ -182,19 +186,11 @@ def delete(request, film_id):
         return redirect(renfilmhome)
 
 
-
-
 @login_required
 @permission_required("cinema.change_movie")   
 def renscreenhome(request):
     screen = Screen.objects.all()
-    # if request.method == "POST":
-    #     form = filmForm(request.POST or None)
-    #     if form.is_valid():
-    #         form.save()
     return render(request, 'cinema/cinman_screen.html', {'screen': screen})
-    # else:
-    #     return render(request, 'home.html', {'all': allFilm})
 
 
 @login_required
@@ -233,41 +229,33 @@ def deletescreen(request, screen_id):
         deleting.delete()
         return redirect(renscreenhome)
 
+
 @login_required
 @permission_required("cinema.change_movie")   
 def renshowhome(request):
-    showing = Showing.objects.all()
-    # if request.method == "POST":
-    #     form = filmForm(request.POST or None)
-    #     if form.is_valid():
-    #         form.save()
+    showing = Showing.objects.all().order_by('date', 'time')
     return render(request, 'cinema/cinman_show.html', {'showing': showing})
-    # else:
-    #     return render(request, 'home.html', {'all': allFilm})
+
 
 @login_required
 @permission_required("cinema.change_movie")   
 def renaddshow(request):
     film = Movie.objects.all()
     screen = Screen.objects.all()
-    # if request.method == "POST":
-    #     form = filmForm(request.POST or None)
-    #     if form.is_valid():
-    #         form.save()
     return render(request, 'cinema/addashow.html', {'film': film, 'screen' : screen})
+
 
 @login_required
 @permission_required("cinema.change_movie")   
 def addshow(request):
     if request.method == "POST":
-        # film = Movie.objects.all()
-        # screen = Screen.objects.all()
         form = showingForm(request.POST, request.FILES or None)
         if form.is_valid():
             form.save()
         return redirect(renshowhome)
     else:
         return render(request, 'cinema/addashow.html', {})
+
 
 @login_required
 @permission_required("cinema.change_movie")   
@@ -281,6 +269,7 @@ def updateshow(request, showing_id):
             return redirect(renshowhome)
         
         return render(request, 'cinema/updateshow.html', {'form': form, 'film': film, 'screen' : screen})
+
 
 @login_required
 @permission_required("cinema.change_movie")   
