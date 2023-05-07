@@ -52,12 +52,8 @@
         <p class="movie-description">{{ movie.description }}</p>
         <h5>Duration</h5>
         <p class="movie-duration">{{ movie.duration }}</p>
-        <h5>Showtimes</h5>
-        <ul class="showtime-list">
-            {% for date in movie.date_set.all %}
-            <li class="showtime-item">{{ date.date }} {{ date.time }}</li>
-            {% endfor %}
-        </ul>
+        <h5>Age Rating</h5>
+        <p class="movie-age_rating">{{ movie.age_rating }}</p>
         <form action="{% url 'showings_list' movie.id %}">
             <button class="book-button">Book Now</button>
         </form>
