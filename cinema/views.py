@@ -8,8 +8,11 @@ from django.db.models import Q
 import messages
 from django.urls import reverse
 from django.core.exceptions import ValidationError
+import stripe
+from uweflix import settings
 
 
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 def home(response):
@@ -39,15 +42,19 @@ def showings_list(request, movie_id):
 
 
 def calculate_total_price(booking, ticket_prices):
-    total_price = 0
-    total_price += booking.child_tickets * ticket_prices.child
-    total_price += booking.student_tickets * ticket_prices.student
-    total_price += booking.adult_tickets * ticket_prices.adult
-    return total_price
+    child_tickets = booking.child_tickets or 0
+    student_tickets = booking.student_tickets or 0
+    adult_tickets = booking.adult_tickets or 0
+    if ticket_prices is None:
+        raise ValueError('Ticket prices not found')
+    return child_tickets * ticket_prices.child + student_tickets * ticket_prices.student + adult_tickets * ticket_prices.adult
+    
 
 def book_showing(request, showing_id):
     showing = get_object_or_404(Showing, pk=showing_id)
     ticket_prices = TicketPrice.objects.first()
+    if ticket_prices is None:
+        raise ValueError('Ticket prices not found')
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
@@ -65,7 +72,24 @@ def book_showing(request, showing_id):
             showing.tickets_sold += booking.child_tickets + booking.student_tickets + booking.adult_tickets
             showing.save()
             booking.save()
-            return redirect('booking_success', booking_id=booking.id)
+
+            # Create a charge and handle success or failure
+            try:
+                amount = int(booking.total_price * 100)  # amount in cents
+                stripe.api_key = settings.STRIPE_SECRET_KEY
+                charge = stripe.Charge.create(
+                    amount=amount,
+                    currency='usd',
+                    description='Cinema ticket booking',
+                    source=request.POST['stripeToken']
+                )
+                # Payment successful, update booking status and redirect to success page
+                booking.payment_status = Booking.PAID
+                booking.save()
+                return redirect('booking_success', booking_id=booking.id)
+            except stripe.error.CardError as e:
+                # Payment failed, show error message
+                form.add_error(None, e.user_message)
     else:
         form = BookingForm()
 
@@ -83,6 +107,7 @@ def book_showing(request, showing_id):
         'form': form,
         'form_elements': form_elements,
         'ticket_prices': ticket_prices,
+        'stripe_publishable_key': settings.STRIPE_PUBLIC_KEY,
     }
     return render(request, 'cinema/book_showing.html', context)
 
@@ -93,6 +118,18 @@ def booking_success(request, booking_id):
     return render(request, 'cinema/booking_success.html', {'booking': booking})
 
 
+
+
+
+def charge(request, showing_id):
+    showing = get_object_or_404(Showing, pk=showing_id)
+    ticket_prices = TicketPrice.objects.first()
+    context = {
+        'showing': showing,
+        'ticket_prices': ticket_prices,
+        'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY,
+    }
+    return render(request, 'cinema/charge.html', context)
 
 
 

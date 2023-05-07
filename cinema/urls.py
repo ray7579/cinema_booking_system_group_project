@@ -6,7 +6,7 @@ urlpatterns=[
     path("movies/", views.list_movies, name = "list_movies"),
     path("show_movie/<movie_id>", views.show_movie, name = "show_movie"),
     path('showings_list/<int:movie_id>/', views.showings_list, name='showings_list'),
-    path('book_showing/<int:showing_id>/', views.book_showing, name='book_showing'),
+    path('book_showing/<int:showing_id>/', views.book_showing, name='book_showing'),#BOOK SHOWING !!!!!!
     path('booking_success/<int:booking_id>/', views.booking_success, name='booking_success'),
     #path('ticket_booking/<int:showing_id>/', views.ticket_booking_view, name='ticket_booking_view'),
     #path("success/<int:ticket_id>/", views.success_view, name="success_view"),  # Updated this line
@@ -23,6 +23,8 @@ urlpatterns=[
     path('renshowhome/updateshow/<showing_id>', views.updateshow, name="updateshow"),
     path('renshowhome/deleteshow/<showing_id>', views.deleteshow, name="deleteshow"),
     path('renshowhome/', views.renshowhome, name = "renshowhome"),
+    path('book_showing/<int:showing_id>/charge', views.charge, name='charge'),
+
 ]
 
 
