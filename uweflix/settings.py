@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import datetime
+import pytz
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -147,4 +149,17 @@ SESSION_COOKIE_AGE = 300
 SESSION_SAVE_EVERY_REQUEST = True
 
 LOGIN_REDIRECT_URL = 'login'
+<<<<<<< HEAD
 LOGIN_URL = 'login'
+=======
+LOGIN_URL = 'login'
+
+
+STRIPE_PUBLIC_KEY = 'pk_test_51N4R16E6uc3JprxHd98BpLEWodnZP8zULKLkvkbmFF7AlzK52TuI2VG5PBuWTzEUUryhI1NHG563CRm0y7pwAAPj00yAsTKNQ7'
+STRIPE_SECRET_KEY = 'sk_test_51N4R16E6uc3JprxHdOdOl4d73UDZy6VAFGqAlQVYeNNJjqZz3PLdAu9hRf7QefZPJEvcXF3qOVIW9ru6L6qXvVVz00miSlBRnj'
+#keys by uhhngy
+
+TIME_ZONE = 'Europe/London'
+
+USE_TZ = True
+>>>>>>> origin/main
