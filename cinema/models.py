@@ -51,7 +51,7 @@ class TicketPrice(models.Model):
 
 class Booking(models.Model):
     email = models.EmailField()
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
     showing = models.ForeignKey(Showing, on_delete=models.CASCADE)
     child_tickets = models.PositiveIntegerField(default=0)
     student_tickets = models.PositiveIntegerField(default=0)

@@ -16,6 +16,10 @@ import base64
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from sib_api_v3_sdk.rest import ApiException
+from accounts.models import User
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
+from decimal import Decimal
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -341,6 +345,14 @@ def not_enough_tickets(request):
 
 
 @login_required
+def booking_history(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    bookings = Booking.objects.filter(user=user)
+    return render(request, 'cinema/booking_history.html', {'user': user, 'bookings': bookings})
+
+
+
+@login_required
 @permission_required("cinema.change_movie")   
 def renfilmhome(request):
     movie = Movie.objects.all()
@@ -517,3 +529,24 @@ def send_booking_email(booking):
     except ApiException as e:
         print(f"An error occurred while sending the email: {e}")
 
+
+
+
+def booking_month_select(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    bookings = user.bookings.all()
+    months = set((booking.showing.date.year, booking.showing.date.month) for booking in bookings)
+    return render(request, 'cinema/booking_month_select.html', {'user': user, 'months': months})
+
+
+def booking_month_view(request, user_id, year, month):
+    user = get_object_or_404(User, pk=user_id)
+    bookings = user.bookings.filter(showing__date__year=year, showing__date__month=month)
+    total_spent = Decimal(sum(booking.total_price for booking in bookings))
+    return render(request, 'cinema/booking_month_view.html', {
+        'user': user,
+        'bookings': bookings,
+        'total_spent': total_spent,
+        'year': year,
+        'month': month
+    })
