@@ -59,15 +59,15 @@ def book_showing(request, showing_id):
             booking = form.save(commit=False)
             booking.showing = showing
 
-            # Calculate the total price and assign it to the booking
+            #calculate the total price and assign it to the booking
             booking.total_price = calculate_total_price(booking, ticket_prices)
 
-            # Check if there are enough tickets available
+            #check if there are enough tickets available
             available_tickets = showing.screen.capacity - showing.tickets_sold
             if booking.child_tickets + booking.student_tickets + booking.adult_tickets > available_tickets:
-                raise ValidationError('Not enough tickets available')
+                return redirect('not_enough_tickets')
 
-            # Create a Stripe charge
+            #create a Stripe charge
             token = request.POST.get('stripeToken')
             amount = int(booking.total_price * 100)  # Convert total price to cents
             try:
@@ -78,7 +78,7 @@ def book_showing(request, showing_id):
                     source=token,
                 )
 
-                # Update the tickets_sold attribute of the showing
+                #update the tickets_sold attribute of the showing
                 showing.tickets_sold += booking.child_tickets + booking.student_tickets + booking.adult_tickets
                 showing.save()
                 booking.save()
@@ -86,19 +86,19 @@ def book_showing(request, showing_id):
                 return redirect('booking_success', booking_id=booking.id)
 
             except stripe.error.CardError as e:
-                # Handle declined payment
+                #if declined payment
                 body = e.json_body
                 err = body.get('error', {})
                 error_message = f"Payment declined: {err.get('message')}"
                 return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
 
             except stripe.error.StripeError as e:
-                # Handle other Stripe errors
+                # if stripe errors
                 error_message = "An error occurred while processing your payment. Please try again."
                 return render(request, 'cinema/book_showing.html', {'error_message': error_message})
 
             except Exception as e:
-                # Handle any other exceptions
+                # srtipe errors
                 error_message = "An unexpected error occurred. Please try again."
                 return render(request, 'cinema/book_showing.html', {'error_message': error_message})
 
@@ -127,6 +127,10 @@ def book_showing(request, showing_id):
 def booking_success(request, booking_id):
     booking = get_object_or_404(Booking, pk=booking_id)
     return render(request, 'cinema/booking_success.html', {'booking': booking})
+
+
+def not_enough_tickets(request):
+    return render(request, 'cinema/not_enough_tickets.html')
 
 
 @login_required

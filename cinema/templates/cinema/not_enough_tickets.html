@@ -1,0 +1,12 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">Not enough tickets available</h4>
+    <p>We're sorry, but there are not enough tickets available for the selected showing. Please try a different showing or reduce the number of tickets.</p>
+    <hr>
+    <a href="/movies" class="btn btn-primary">Back to Movies</a>
+  </div>
+</div>
+{% endblock %}
