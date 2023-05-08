@@ -1,20 +1,21 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from .models import Movie, Screen, Showing, TicketPrice
 from .forms import filmForm, screenForm, showingForm, BookingForm, Booking, StudentBookingForm, ClubRepBookingForm
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Q
-# from django.core.exceptions import ProtectedError
-from django.urls import reverse
-from django.core.exceptions import ValidationError
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+#from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from datetime import timedelta, datetime
 import messages
 import stripe
+import qrcode
+from sib_api_v3_sdk.api import TransactionalEmailsApi
+from sib_api_v3_sdk import Configuration, SendSmtpEmail, ApiClient
+import base64
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
+from sib_api_v3_sdk.rest import ApiException
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -42,7 +43,8 @@ def confirm_movie(response,movie_id):
 def showings_list(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
     current_datetime = timezone.now()
-    showings = Showing.objects.filter(film=movie, date__gte=current_datetime.date(), time__gte=current_datetime.time()).order_by('date', 'time')
+    showings = Showing.objects.filter(film=movie, date__gte=current_datetime.date()).order_by('date', 'time')
+    showings = [showing for showing in showings if not (showing.date == current_datetime.date() and showing.time < current_datetime.time())]
     return render(request, 'cinema/showings_list.html', {'movie': movie, 'showings': showings})
 
 
@@ -314,6 +316,23 @@ def club_rep_book_showing(request, showing_id):
 
 def booking_success(request, booking_id):
     booking = get_object_or_404(Booking, pk=booking_id)
+
+    # Generate QR code
+    qr_data = f"Booking ID: {booking.id}, Movie: {booking.showing.film.name}, Screen: {booking.showing.screen.number}, Date: {booking.showing.date}, Time: {booking.showing.time}"
+    qr_image = qrcode.make(qr_data)
+
+    # Save QR code to a temporary file
+    temp_file = NamedTemporaryFile()
+    qr_image.save(temp_file, format='PNG')
+    temp_file.flush()
+
+    # Save the temporary file to the booking object
+    booking.qr_code.save(f"qr_code_{booking.id}.png", File(temp_file))
+    booking.save()
+
+    # Send the booking email
+    send_booking_email(booking)
+
     return render(request, 'cinema/booking_success.html', {'booking': booking})
 
 
@@ -458,3 +477,43 @@ def deleteshow(request, showing_id):
     deleting = Showing.objects.get(id=showing_id)
     deleting.delete()
     return redirect(renshowhome)
+
+
+def send_booking_email(booking):
+    configuration = Configuration()
+    configuration.api_key['api-key'] = settings.SENDINBLUE_API_KEY
+    api_instance = TransactionalEmailsApi(ApiClient(configuration))
+
+    # Include the QR code as an attachment
+    qr_code_file_path = booking.qr_code.path
+    with open(qr_code_file_path, "rb") as f:
+        qr_code_content = f.read()
+
+    # Encode the QR code content as base64
+    qr_code_base64 = base64.b64encode(qr_code_content).decode('utf-8')
+
+    email_data = SendSmtpEmail(
+        to=[{"email": booking.email}],
+        sender={"email": "info.uweflixcinema@gmail.com", "name": "UWEFlix Cinema"},
+        subject="Booking Confirmation",
+        html_content = f'''
+        <p>Thank you for booking tickets at our cinema. Please find your booking details and QR code below.</p>
+        <p><strong>Movie:</strong> {booking.showing.film.name}</p>
+        <p><strong>Screen:</strong> {booking.showing.screen.number}</p>
+        <p><strong>Date:</strong> {booking.showing.date}</p>
+        <p><strong>Time:</strong> {booking.showing.time}</p>
+        <img src="data:image/png;base64,{qr_code_base64}">
+        '''
+    )
+
+    # Attach the QR code as an attachment
+    email_data.attachments = [{
+        "name": f"qr_code_{booking.id}.png",
+        "content": qr_code_base64
+    }]
+
+    try:
+        api_instance.send_transac_email(email_data)
+    except ApiException as e:
+        print(f"An error occurred while sending the email: {e}")
+
