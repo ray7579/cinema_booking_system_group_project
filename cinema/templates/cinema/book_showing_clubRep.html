@@ -14,7 +14,7 @@
     <h2 class="text-white text-center">Book Showing for {{ showing.film.name }}</h2>
     <h4 class="text-white text-center">Date: {{ showing.date }} - Time: {{ showing.time }} - Screen: {{ showing.screen.number }}</h4>
     <hr>
-    <form method="post" id="bookingForm" action="{% url 'book_showing' showing.id %}">
+    <form method="post" id="bookingForm" action="{% url 'club_rep_book_showing' showing.id %}">
       {% csrf_token %}
       <div class="form-group">
         <label for="{{ form.email.id_for_label }}" class="text-white">Email:</label>
