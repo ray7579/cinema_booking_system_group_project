@@ -1,0 +1,36 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Booking History by Month{% endblock %}
+
+{% block content %}
+  <div class="container-fluid">
+    <h2 class="text-center">Booking History by Month</h2>
+    {% if not bookings_by_month %}
+      <p class="text-center">No bookings found.</p>
+    {% else %}
+      {% for booking in bookings_by_month %}
+        <h3 class="text-center">{{ booking.month|date:"F Y" }} ({{ booking.count }})</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Movie</th>
+              <th>Showtime</th>
+              <th>Tickets</th>
+              <th>Total Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking_obj in booking.booking_set.all %}
+              <tr>
+                <td>{{ booking_obj.showing.movie.title }}</td>
+                <td>{{ booking_obj.showing.date|date:"F j, Y" }} {{ booking_obj.showing.time|time:"g:i A" }}</td>
+                <td>Child: {{ booking_obj.child_tickets }}, Student: {{ booking_obj.student_tickets }}, Adult: {{ booking_obj.adult_tickets }}</td>
+                <td>{{ booking_obj.total_price|floatformat:2 }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endfor %}
+    {% endif %}
+  </div>
+{% endblock %}
