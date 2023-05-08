@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-obdvji#6$v@&xz4h9)7g13!qwvjvsg55)b=a82+^g*y8@8ccj!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -86,8 +86,8 @@ DATABASES = {
             'NAME': 'uweflix',
             'USER': 'test-user',
             'PASSWORD': 'test-password',
-            'HOST': '127.0.0.1',
-            'PORT': 5433,
+            'HOST': 'db',
+            'PORT': 5432,
         }
     }
 
