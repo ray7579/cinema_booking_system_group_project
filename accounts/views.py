@@ -9,6 +9,22 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import UpdateView
+from django.contrib.auth.decorators import user_passes_test
+
+
+def is_accountmanager(user):
+    return user.is_authenticated and user.is_accountmanager
+
+def is_cinemamanager(user):
+    return user.is_authenticated and user.is_cinemamanager
+
+def is_student(user):
+    return user.is_authenticated and user.is_student
+
+def is_clubrep(user):
+    return user.is_authenticated and user.is_clubrep
+
+
 
 
 def home(request):
@@ -96,12 +112,12 @@ def logout_view(request):
     logout(request)
     return redirect('/')
 
-@login_required
+@user_passes_test(is_accountmanager)
 def accountshome(request):
     users = User.objects.order_by('username')
     return render(request, 'accounts/accountslist.html', {'users': users})
 
-@login_required
+@user_passes_test(is_accountmanager)
 def updateuser(request, user_id):
     user = User.objects.get(id=user_id)
     form = userForm(request.POST or None, instance=user)
@@ -138,9 +154,6 @@ def updateuser(request, user_id):
 
                 })
 
-
-      
-
     if form.is_valid() and tempform.is_valid():
         form.save()
         tempform.save()
@@ -149,7 +162,8 @@ def updateuser(request, user_id):
 
     return render(request, 'accounts/updateuser.html', {'form': form, 'tempform': tempform})
 
-@login_required
+
+@user_passes_test(is_accountmanager)
 def deleteuser(request, user_id):
     deleting = User.objects.get(id=user_id)
     deleting.delete()

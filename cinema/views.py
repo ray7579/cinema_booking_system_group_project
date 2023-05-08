@@ -20,8 +20,29 @@ from accounts.models import User
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
 from decimal import Decimal
+from django.contrib.auth.decorators import user_passes_test
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+
+def is_accountmanager(user):
+    return user.is_authenticated and user.is_accountmanager
+
+def is_cinemamanager(user):
+    return user.is_authenticated and user.is_cinemamanager
+
+def is_student(user):
+    return user.is_authenticated and user.is_student
+
+def is_clubrep(user):
+    return user.is_authenticated and user.is_clubrep
+
+
+
+
+
+
 
 
 def home(response):
@@ -52,14 +73,6 @@ def showings_list(request, movie_id):
     return render(request, 'cinema/showings_list.html', {'movie': movie, 'showings': showings})
 
 
-#def calculate_total_price(booking, ticket_prices):
-#    total_price = 0
-#    total_price += booking.child_tickets * ticket_prices.child
-#    total_price += booking.student_tickets * ticket_prices.student
-#    total_price += booking.adult_tickets * ticket_prices.adult
-#    return total_price
-
-from decimal import Decimal
 
 def calculate_total_price(booking, ticket_prices, is_clubrep):
     total_price = Decimal('0.00')
@@ -161,7 +174,7 @@ def book_showing(request, showing_id):
     return render(request, 'cinema/book_showing.html', context)
 
 
-
+@user_passes_test(is_student)
 def student_book_showing(request, showing_id):
     showing = get_object_or_404(Showing, pk=showing_id)
     current_datetime = timezone.now()
@@ -251,7 +264,7 @@ def student_book_showing(request, showing_id):
 
 
 
-
+@user_passes_test(is_clubrep)
 def club_rep_book_showing(request, showing_id):
     showing = get_object_or_404(Showing, pk=showing_id)
     current_datetime = timezone.now()
@@ -269,26 +282,26 @@ def club_rep_book_showing(request, showing_id):
             booking = form.save(commit=False)
             booking.showing = showing
 
-            # Add your logic here for handling the Club Rep booking submission
+            #add your logic here for handling the Club Rep booking submission
 
-            # Save the logged-in user's account to the booking
+            #save the logged-in user's account to the booking
             if request.user.is_authenticated:
                 booking.user = request.user
                 booking.email = request.user.email
                 is_clubrep = request.user.is_clubrep
 
-            # Calculate the total price and assign it to the booking
+            #calculate the total price and assign it to the booking
             booking.total_price = calculate_total_price(booking, ticket_prices, is_clubrep)
 
-            # Check if there are enough tickets available
+            #check if there are enough tickets available
             available_tickets = showing.screen.capacity - showing.tickets_sold
             if booking.student_tickets > available_tickets:
                 error_message = 'Not enough tickets available'
                 return render(request, 'cinema/club_rep_book_showing.html', {'error_message': error_message, 'showing': showing})
 
-            # Add your payment processing logic here
+            #add your payment processing logic here
 
-            # Update the tickets_sold attribute of the showing
+            #update the tickets_sold attribute of the showing
             showing.tickets_sold += booking.student_tickets
             showing.save()
             booking.save()
@@ -321,20 +334,20 @@ def club_rep_book_showing(request, showing_id):
 def booking_success(request, booking_id):
     booking = get_object_or_404(Booking, pk=booking_id)
 
-    # Generate QR code
+    #generate QR code
     qr_data = f"Booking ID: {booking.id}, Movie: {booking.showing.film.name}, Screen: {booking.showing.screen.number}, Date: {booking.showing.date}, Time: {booking.showing.time}"
     qr_image = qrcode.make(qr_data)
 
-    # Save QR code to a temporary file
+    #save QR code to a temporary file
     temp_file = NamedTemporaryFile()
     qr_image.save(temp_file, format='PNG')
     temp_file.flush()
 
-    # Save the temporary file to the booking object
+    #save the temporary file to the booking object
     booking.qr_code.save(f"qr_code_{booking.id}.png", File(temp_file))
     booking.save()
 
-    # Send the booking email
+    #send the booking email
     send_booking_email(booking)
 
     return render(request, 'cinema/booking_success.html', {'booking': booking})
@@ -344,7 +357,7 @@ def not_enough_tickets(request):
     return render(request, 'cinema/not_enough_tickets.html')
 
 
-@login_required
+@user_passes_test(is_accountmanager)
 def booking_history(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     bookings = Booking.objects.filter(user=user)
@@ -352,15 +365,13 @@ def booking_history(request, user_id):
 
 
 
-@login_required
-@permission_required("cinema.change_movie")   
+@user_passes_test(is_cinemamanager)   
 def renfilmhome(request):
     movie = Movie.objects.all()
     return render(request, 'cinema/home_copy.html', {'movie': movie})
 
 
-@login_required
-@permission_required("cinema.add_movie")
+@user_passes_test(is_cinemamanager)
 def addfilm(request):
     if request.method == "POST":
         form = filmForm(request.POST, request.FILES or None)
@@ -371,8 +382,7 @@ def addfilm(request):
         return render(request, 'cinema/addafilm.html', {})
 
 
-@login_required
-@permission_required("cinema.change_movie")
+@user_passes_test(is_cinemamanager)
 def updatefilm(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
     if request.method == 'POST':
@@ -385,8 +395,8 @@ def updatefilm(request, movie_id):
     return render(request, 'cinema/updatefilm.html', {'form': form, 'movie': movie})
 
 
-@login_required
-@permission_required("cinema.delete_movie")
+
+@user_passes_test(is_cinemamanager)
 def delete(request, film_id):
 
     deleting = get_object_or_404(Movie, id=film_id)
@@ -398,15 +408,13 @@ def delete(request, film_id):
         return redirect(renfilmhome)
 
 
-@login_required
-@permission_required("cinema.change_movie")   
+@user_passes_test(is_cinemamanager)
 def renscreenhome(request):
     screen = Screen.objects.all()
     return render(request, 'cinema/cinman_screen.html', {'screen': screen})
 
 
-@login_required
-@permission_required("cinema.change_movie")   
+@user_passes_test(is_cinemamanager)
 def addscreen(request):
     if request.method == "POST":
         form = screenForm(request.POST, request.FILES or None)
@@ -417,8 +425,7 @@ def addscreen(request):
         return render(request, 'cinema/addascreen.html', {})
 
 
-@login_required
-@permission_required("cinema.change_movie")   
+@user_passes_test(is_cinemamanager)  
 def updatescreen(request, screen_id):
         screen = get_object_or_404(Screen, id=screen_id)
         form = screenForm(request.POST or None, instance=screen)
@@ -429,8 +436,7 @@ def updatescreen(request, screen_id):
         return render(request, 'cinema/updatescreen.html', {'form': form, 'screen': screen})
 
 
-@login_required
-@permission_required("cinema.change_movie")   
+@user_passes_test(is_cinemamanager)  
 def deletescreen(request, screen_id):
 
     deleting = get_object_or_404(Screen, id=screen_id)
@@ -442,23 +448,20 @@ def deletescreen(request, screen_id):
         return redirect(renscreenhome)
 
 
-@login_required
-@permission_required("cinema.change_movie")   
+@user_passes_test(is_cinemamanager)  
 def renshowhome(request):
     showing = Showing.objects.all().order_by('date', 'time')
     return render(request, 'cinema/cinman_show.html', {'showing': showing})
 
 
-@login_required
-@permission_required("cinema.change_movie")   
+@user_passes_test(is_cinemamanager)
 def renaddshow(request):
     film = Movie.objects.all()
     screen = Screen.objects.all()
     return render(request, 'cinema/addashow.html', {'film': film, 'screen' : screen})
 
 
-@login_required
-@permission_required("cinema.change_movie")   
+@user_passes_test(is_cinemamanager)
 def addshow(request):
     if request.method == "POST":
         form = showingForm(request.POST, request.FILES or None)
@@ -469,8 +472,7 @@ def addshow(request):
         return render(request, 'cinema/addashow.html', {})
 
 
-@login_required
-@permission_required("cinema.change_movie")   
+@user_passes_test(is_cinemamanager)  
 def updateshow(request, showing_id):
         film = Movie.objects.all()
         screen = Screen.objects.all()
@@ -483,8 +485,7 @@ def updateshow(request, showing_id):
         return render(request, 'cinema/updateshow.html', {'form': form, 'film': film, 'screen' : screen})
 
 
-@login_required
-@permission_required("cinema.change_movie")   
+@user_passes_test(is_cinemamanager)  
 def deleteshow(request, showing_id):
     deleting = Showing.objects.get(id=showing_id)
     deleting.delete()
@@ -496,12 +497,12 @@ def send_booking_email(booking):
     configuration.api_key['api-key'] = settings.SENDINBLUE_API_KEY
     api_instance = TransactionalEmailsApi(ApiClient(configuration))
 
-    # Include the QR code as an attachment
+    #include the QR code as an attachment
     qr_code_file_path = booking.qr_code.path
     with open(qr_code_file_path, "rb") as f:
         qr_code_content = f.read()
 
-    # Encode the QR code content as base64
+    #encode the QR code content as base64
     qr_code_base64 = base64.b64encode(qr_code_content).decode('utf-8')
 
     email_data = SendSmtpEmail(
@@ -518,7 +519,7 @@ def send_booking_email(booking):
         '''
     )
 
-    # Attach the QR code as an attachment
+    #attach the QR code as an attachment
     email_data.attachments = [{
         "name": f"qr_code_{booking.id}.png",
         "content": qr_code_base64
@@ -531,14 +532,14 @@ def send_booking_email(booking):
 
 
 
-
+@user_passes_test(is_accountmanager)
 def booking_month_select(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     bookings = user.bookings.all()
     months = set((booking.showing.date.year, booking.showing.date.month) for booking in bookings)
     return render(request, 'cinema/booking_month_select.html', {'user': user, 'months': months})
 
-
+@user_passes_test(is_accountmanager)
 def booking_month_view(request, user_id, year, month):
     user = get_object_or_404(User, pk=user_id)
     bookings = user.bookings.filter(showing__date__year=year, showing__date__month=month)
