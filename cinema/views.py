@@ -42,7 +42,8 @@ def confirm_movie(response,movie_id):
 def showings_list(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
     current_datetime = timezone.now()
-    showings = Showing.objects.filter(film=movie, date__gte=current_datetime.date(), time__gte=current_datetime.time()).order_by('date', 'time')
+    showings = Showing.objects.filter(film=movie, date__gte=current_datetime.date()).order_by('date', 'time')
+    showings = [showing for showing in showings if not (showing.date == current_datetime.date() and showing.time < current_datetime.time())]
     return render(request, 'cinema/showings_list.html', {'movie': movie, 'showings': showings})
 
 
