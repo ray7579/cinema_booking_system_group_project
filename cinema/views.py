@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from .models import Movie, Screen, Showing, TicketPrice
-from .forms import filmForm, screenForm, showingForm, BookingForm, Booking, StudentBookingForm
+from .forms import filmForm, screenForm, showingForm, BookingForm, Booking, StudentBookingForm, ClubRepBookingForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Q
 # from django.core.exceptions import ProtectedError
@@ -46,12 +46,26 @@ def showings_list(request, movie_id):
     return render(request, 'cinema/showings_list.html', {'movie': movie, 'showings': showings})
 
 
-def calculate_total_price(booking, ticket_prices):
-    total_price = 0
+#def calculate_total_price(booking, ticket_prices):
+#    total_price = 0
+#    total_price += booking.child_tickets * ticket_prices.child
+#    total_price += booking.student_tickets * ticket_prices.student
+#    total_price += booking.adult_tickets * ticket_prices.adult
+#    return total_price
+
+from decimal import Decimal
+
+def calculate_total_price(booking, ticket_prices, is_clubrep):
+    total_price = Decimal('0.00')
     total_price += booking.child_tickets * ticket_prices.child
     total_price += booking.student_tickets * ticket_prices.student
     total_price += booking.adult_tickets * ticket_prices.adult
-    return total_price
+    if is_clubrep:
+        discount = Decimal('0.1')
+        total_price *= (Decimal('1.00') - discount)
+    return total_price.quantize(Decimal('.01'))
+
+
 
 def book_showing(request, showing_id):
     showing = get_object_or_404(Showing, pk=showing_id)
@@ -70,8 +84,14 @@ def book_showing(request, showing_id):
             booking = form.save(commit=False)
             booking.showing = showing
 
+            if request.user.is_authenticated:
+                is_clubrep = request.user.is_clubrep
+            else:
+                is_clubrep = False
+
+
             #calculate the total price and assign it to the booking
-            booking.total_price = calculate_total_price(booking, ticket_prices)
+            booking.total_price = calculate_total_price(booking, ticket_prices, is_clubrep)
 
             #check if there are enough tickets available
             available_tickets = showing.screen.capacity - showing.tickets_sold
@@ -157,9 +177,10 @@ def student_book_showing(request, showing_id):
             if request.user.is_authenticated:
                 booking.user = request.user
                 booking.email = request.user.email
+                is_clubrep = request.user.is_clubrep
 
             #calculate the total price and assign it to the booking
-            booking.total_price = calculate_total_price(booking, ticket_prices)
+            booking.total_price = calculate_total_price(booking, ticket_prices, is_clubrep)
 
             #check if there are enough tickets available
             available_tickets = showing.screen.capacity - showing.tickets_sold
@@ -221,6 +242,74 @@ def student_book_showing(request, showing_id):
         'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
     }
     return render(request, 'cinema/student_book_showing.html', context)
+
+
+
+
+def club_rep_book_showing(request, showing_id):
+    showing = get_object_or_404(Showing, pk=showing_id)
+    current_datetime = timezone.now()
+    showing_datetime = datetime.combine(showing.date, showing.time, tzinfo=current_datetime.tzinfo)
+    one_minute_before_showing = showing_datetime - timedelta(minutes=1)
+
+    if current_datetime >= one_minute_before_showing:
+        error_message = 'Booking is not allowed within 1 minute of the showtime'
+        return render(request, 'cinema/club_rep_book_showing.html', {'error_message': error_message, 'showing': showing})
+
+    ticket_prices = TicketPrice.objects.first()
+    if request.method == 'POST':
+        form = ClubRepBookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.showing = showing
+
+            # Add your logic here for handling the Club Rep booking submission
+
+            # Save the logged-in user's account to the booking
+            if request.user.is_authenticated:
+                booking.user = request.user
+                booking.email = request.user.email
+                is_clubrep = request.user.is_clubrep
+
+            # Calculate the total price and assign it to the booking
+            booking.total_price = calculate_total_price(booking, ticket_prices, is_clubrep)
+
+            # Check if there are enough tickets available
+            available_tickets = showing.screen.capacity - showing.tickets_sold
+            if booking.student_tickets > available_tickets:
+                error_message = 'Not enough tickets available'
+                return render(request, 'cinema/club_rep_book_showing.html', {'error_message': error_message, 'showing': showing})
+
+            # Add your payment processing logic here
+
+            # Update the tickets_sold attribute of the showing
+            showing.tickets_sold += booking.student_tickets
+            showing.save()
+            booking.save()
+
+            return redirect('booking_success', booking_id=booking.id)
+    else:
+        form = ClubRepBookingForm()
+
+    form_elements = {
+        ticket_type: {
+            'label': form[ticket_type + '_tickets'].label_tag,
+            'field': form[ticket_type + '_tickets'],
+            'initial': form.initial.get(ticket_type + '_tickets', 0),
+        }
+        for ticket_type in ['student']
+    }
+
+    context = {
+        'showing': showing,
+        'form': form,
+        'form_elements': form_elements,
+        'ticket_prices': ticket_prices,
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+    }
+    return render(request, 'cinema/club_rep_book_showing.html', context)
+
+
 
 
 def booking_success(request, booking_id):

@@ -8,6 +8,7 @@ urlpatterns=[
     path('showings_list/<int:movie_id>/', views.showings_list, name='showings_list'),
     path('book_showing/<int:showing_id>/', views.book_showing, name='book_showing'),
     path('student_book_showing/<int:showing_id>/', views.student_book_showing, name='student_book_showing'),
+    path('club_rep_book_showing/<int:showing_id>/', views.club_rep_book_showing, name='club_rep_book_showing'),
     path('booking_success/<int:booking_id>/', views.booking_success, name='booking_success'),
     path('not_enough_tickets/', views.not_enough_tickets, name='not_enough_tickets'),
     #path('ticket_booking/<int:showing_id>/', views.ticket_booking_view, name='ticket_booking_view'),
