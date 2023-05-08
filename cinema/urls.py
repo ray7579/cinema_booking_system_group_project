@@ -11,6 +11,7 @@ urlpatterns=[
     path('club_rep_book_showing/<int:showing_id>/', views.club_rep_book_showing, name='club_rep_book_showing'),
     path('booking_success/<int:booking_id>/', views.booking_success, name='booking_success'),
     path('not_enough_tickets/', views.not_enough_tickets, name='not_enough_tickets'),
+    path('accountslist/bookinghistory/<int:user_id>/', views.booking_history, name='booking_history'),
     #path('ticket_booking/<int:showing_id>/', views.ticket_booking_view, name='ticket_booking_view'),
     #path("success/<int:ticket_id>/", views.success_view, name="success_view"),  # Updated this line
     path('renfilmhome/addfilm/', views.addfilm, name="addfilm"),

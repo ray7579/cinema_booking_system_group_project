@@ -16,6 +16,7 @@ import base64
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from sib_api_v3_sdk.rest import ApiException
+from accounts.models import User
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -338,6 +339,14 @@ def booking_success(request, booking_id):
 
 def not_enough_tickets(request):
     return render(request, 'cinema/not_enough_tickets.html')
+
+
+@login_required
+def booking_history(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    bookings = Booking.objects.filter(user=user)
+    return render(request, 'cinema/booking_history.html', {'user': user, 'bookings': bookings})
+
 
 
 @login_required
