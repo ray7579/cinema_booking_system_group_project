@@ -1,0 +1,202 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<h1> THIS IS CLUBREP PAGE</h1>
+{% if error_message %}
+    <div class="alert alert-danger" role="alert">
+        {{ error_message }}
+        <br>
+        <a href="/movies">Movies</a>
+      </div>
+{% endif %}
+<div class="booking-container">
+  <div class="booking-card">
+    <h2 class="text-white text-center">Book Showing for {{ showing.film.name }}</h2>
+    <h4 class="text-white text-center">Date: {{ showing.date }} - Time: {{ showing.time }} - Screen: {{ showing.screen.number }}</h4>
+    <hr>
+    <form method="post" id="bookingForm" action="{% url 'book_showing' showing.id %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="{{ form.email.id_for_label }}" class="text-white">Email:</label>
+        {{ form.email }}
+      </div>
+      {% for ticket_type, elements in form_elements.items %}
+        <div class="form-group">
+          <label class="text-white">{{ elements.label }}:</label>
+          <div class="ticket-type-input">
+            <button type="button" class="minus-button" data-ticket-type="{{ ticket_type }}">-</button>
+            {{ elements.field }}
+            <button type="button" class="plus-button" data-ticket-type="{{ ticket_type }}">+</button>
+          </div>
+        </div>
+      {% endfor %}
+      <hr>
+      <div class="form-group">
+        <label class="text-white">Total Price:</label>
+        <span id="totalPrice" class="text-white">0.00</span>
+      </div>
+      <hr>
+      <div class="form-group">
+        <label class="text-white">Card Information:</label>
+        <div id="card-element">
+          <!-- Elements will create input elements here -->
+        </div>
+        <div id="card-errors" role="alert"></div>
+      </div>
+      <hr>
+      {% if not error_message %}
+      <div class="text-center">
+        <button type="submit" class="btn btn-outline-danger">Pay and Book</button>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+
+<style>
+  .text-white {
+    color: #ffffff;
+  }
+  .booking-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding-left: 200px;
+    padding-right: 200px;
+  }
+  .booking-card {
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 5px;
+    max-width: 700px;
+  }
+  .ticket-type-input {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .minus-button,
+  .plus-button {
+    width: 25px;
+    height: 25px;
+    background-color: #ffffff;
+    color: #000000;
+    border: none;
+    text-align: center;
+  }
+  .StripeElement {
+    background-color: #ffffff;
+    color: #000000;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+  .StripeElement--focus {
+    outline: none;
+    border-color: #ffffff;
+  }
+  #card-errors {
+    color: #ff6b81;
+  }
+</style>
+
+
+  {% load static %}
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    const form = document.getElementById('bookingForm');
+    const totalPriceElement = document.getElementById('totalPrice');
+    const minusButtons = document.querySelectorAll('.minus-button');
+    const plusButtons = document.querySelectorAll('.plus-button');
+    const ticketPrices = {
+        child: parseFloat("{{ ticket_prices.child }}"),
+        student: parseFloat("{{ ticket_prices.student }}"),
+        adult: parseFloat("{{ ticket_prices.adult }}"),
+    };
+
+    minusButtons.forEach(button => {
+      button.addEventListener('click', event => {
+          const ticketType = event.target.dataset.ticketType;
+          const input = form.elements[ticketType + '_tickets'];
+          if (input.value > 0) {
+            input.value -= 1;
+          }
+          updateTotalPrice();
+      });
+    });
+
+    plusButtons.forEach(button => {
+      button.addEventListener('click', event => {
+          const ticketType = event.target.dataset.ticketType;
+          const input = form.elements[ticketType + '_tickets'];
+          input.value = parseInt(input.value) + 1;
+          updateTotalPrice();
+      });
+    });
+
+    function updateTotalPrice() {
+      let totalPrice = 0;
+      for (const ticketType of ['child', 'student', 'adult']) {
+          const input = form.elements[ticketType + '_tickets'];
+          totalPrice += input.value * ticketPrices[ticketType];
+      }
+      totalPriceElement.innerText = totalPrice.toFixed(2);
+    }
+
+    // Update the total price initially
+    updateTotalPrice();
+
+    // Create a Stripe client
+    var stripe = Stripe('{{ stripe_public_key }}');
+
+    // Create an instance of Elements
+    var elements = stripe.elements();
+
+    // Create an instance of the card Element
+    var card = elements.create('card');
+
+    // Add an instance of the card Element into the `card-element` <div>
+    card.mount('#card-element');
+
+    // Handle real-time validation errors from the card Element.
+    card.on('change', function(event) {
+      var displayError = document.getElementById('card-errors');
+      if (event.error) {
+        displayError.textContent = event.error.message;
+      } else {
+        displayError.textContent = '';
+      }
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    stripe.createToken(card).then(function(result) {
+    if (result.error) {
+      // Inform the user if there was an error
+      var errorElement = document.getElementById('card-errors');
+      errorElement.textContent = result.error.message;
+    } else {
+      // Send the token to your server
+      stripeTokenHandler(result.token);
+    }
+  });
+});
+
+function stripeTokenHandler(token) {
+  // Insert the token ID into the form so it gets submitted to the server
+  var form = document.getElementById('bookingForm');
+  var hiddenInput = document.createElement('input');
+  hiddenInput.setAttribute('type', 'hidden');
+  hiddenInput.setAttribute('name', 'stripeToken');
+  hiddenInput.setAttribute('value', token.id);
+  form.appendChild(hiddenInput);
+
+  // Submit the form
+  form.submit();
+}
+
+</script>
+{% endblock %}

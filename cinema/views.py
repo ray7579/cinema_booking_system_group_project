@@ -3,9 +3,6 @@ from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from .models import Movie, Screen, Showing, TicketPrice
 from .forms import filmForm, screenForm, showingForm, BookingForm, Booking
 from django.contrib.auth.decorators import login_required, permission_required
-<<<<<<< HEAD
-
-=======
 from django.db.models import Q
 # from django.core.exceptions import ProtectedError
 from django.urls import reverse
@@ -18,9 +15,10 @@ from django.utils import timezone
 from datetime import timedelta, datetime
 import messages
 import stripe
+from accounts.models import ClubRep,User
+from accounts.forms import userForm
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
->>>>>>> origin/main
 
 @csrf_exempt
 def stripe_config(request):
@@ -65,118 +63,87 @@ def calculate_total_price(booking, ticket_prices):
     
 
 def book_showing(request, showing_id):
-    showing = get_object_or_404(Showing, pk=showing_id)
-    current_datetime = timezone.now()
-    showing_datetime = datetime.combine(showing.date, showing.time, tzinfo=current_datetime.tzinfo)
-    one_minute_before_showing = showing_datetime - timedelta(minutes=1)
+        showing = get_object_or_404(Showing, pk=showing_id)
+        current_datetime = timezone.now()
+        showing_datetime = datetime.combine(showing.date, showing.time, tzinfo=current_datetime.tzinfo)
+        one_minute_before_showing = showing_datetime - timedelta(minutes=1)
 
-    if current_datetime >= one_minute_before_showing:
-        error_message = 'Booking is not allowed within 1 minute of the showtime'
-        return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
+        if current_datetime >= one_minute_before_showing:
+            error_message = 'Booking is not allowed within 1 minute of the showtime'
+            return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
 
-    ticket_prices = TicketPrice.objects.first()
-    if ticket_prices is None:
-        raise ValueError('Ticket prices not found')
-    if request.method == 'POST':
-        form = BookingForm(request.POST)
-        if form.is_valid():
-            booking = form.save(commit=False)
-            booking.showing = showing
+        ticket_prices = TicketPrice.objects.first()
+        if ticket_prices is None:
+            raise ValueError('Ticket prices not found')
+        if request.method == 'POST':
+            form = BookingForm(request.POST)
+            if form.is_valid():
+                booking = form.save(commit=False)
+                booking.showing = showing
 
-            # Calculate the total price and assign it to the booking
-            booking.total_price = calculate_total_price(booking, ticket_prices)
+                # Calculate the total price and assign it to the booking
+                booking.total_price = calculate_total_price(booking, ticket_prices)
 
-            # Check if there are enough tickets available
-            available_tickets = showing.screen.capacity - showing.tickets_sold
-            if booking.child_tickets + booking.student_tickets + booking.adult_tickets > available_tickets:
-<<<<<<< HEAD
-                raise ValidationError('Not enough tickets available')
-            
-            #update the tickets_sold attribute of the showing
-            showing.tickets_sold += booking.child_tickets + booking.student_tickets + booking.adult_tickets
-            showing.save()
-            booking.save()
+                # Check if there are enough tickets available
+                available_tickets = showing.screen.capacity - showing.tickets_sold
+                if booking.child_tickets + booking.student_tickets + booking.adult_tickets > available_tickets:
+                    error_message = 'Not enough tickets available'
+                    return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
 
-            # Create a charge and handle success or failure
-            try:
-                amount = int(booking.total_price * 100)  # amount in cents
-                stripe.api_key = settings.STRIPE_SECRET_KEY
-                charge = stripe.Charge.create(
-                    amount=amount,
-                    currency='usd',
-                    description='Cinema ticket booking',
-                    source=request.POST['stripeToken']
-                )
-                # Payment successful, update booking status and redirect to success page
-                booking.payment_status = Booking.PAID
-                booking.save()
-                return redirect('booking_success', booking_id=booking.id)
-            except stripe.error.CardError as e:
-                # Payment failed, show error message
-                form.add_error(None, e.user_message)
-=======
-                error_message = 'Not enough tickets available'
-                return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
+                # Create a Stripe charge
+                token = request.POST.get('stripeToken')
+                amount = int(booking.total_price * 100)  # Convert total price to cents
+                try:
+                    charge = stripe.Charge.create(
+                        amount=amount,
+                        currency='gbp',
+                        description='Cinema Ticket Booking',
+                        source=token,
+                    )
 
-            # Create a Stripe charge
-            token = request.POST.get('stripeToken')
-            amount = int(booking.total_price * 100)  # Convert total price to cents
-            try:
-                charge = stripe.Charge.create(
-                    amount=amount,
-                    currency='gbp',
-                    description='Cinema Ticket Booking',
-                    source=token,
-                )
+                    # Update the tickets_sold attribute of the showing
+                    showing.tickets_sold += booking.child_tickets + booking.student_tickets + booking.adult_tickets
+                    showing.save()
+                    booking.save()
 
-                # Update the tickets_sold attribute of the showing
-                showing.tickets_sold += booking.child_tickets + booking.student_tickets + booking.adult_tickets
-                showing.save()
-                booking.save()
+                    return redirect('booking_success', booking_id=booking.id)
 
-                return redirect('booking_success', booking_id=booking.id)
+                except stripe.error.CardError as e:
+                    # Handle declined payment
+                    body = e.json_body
+                    err = body.get('error', {})
+                    error_message = f"Payment declined: {err.get('message')}"
+                    return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
 
-            except stripe.error.CardError as e:
-                # Handle declined payment
-                body = e.json_body
-                err = body.get('error', {})
-                error_message = f"Payment declined: {err.get('message')}"
-                return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
+                except stripe.error.StripeError as e:
+                    # Handle other Stripe errors
+                    error_message = "An error occurred while processing your payment. Please try again."
+                    return render(request, 'cinema/book_showing.html', {'error_message': error_message})
 
-            except stripe.error.StripeError as e:
-                # Handle other Stripe errors
-                error_message = "An error occurred while processing your payment. Please try again."
-                return render(request, 'cinema/book_showing.html', {'error_message': error_message})
+                except Exception as e:
+                    # Handle any other exceptions
+                    error_message = "An unexpected error occurred. Please try again."
+                    return render(request, 'cinema/book_showing.html', {'error_message': error_message})
+        else:
+            form = BookingForm()
 
-            except Exception as e:
-                # Handle any other exceptions
-                error_message = "An unexpected error occurred. Please try again."
-                return render(request, 'cinema/book_showing.html', {'error_message': error_message})
->>>>>>> origin/main
-    else:
-        form = BookingForm()
-
-    form_elements = {
-        ticket_type: {
-            'label': form[ticket_type + '_tickets'].label_tag,
-            'field': form[ticket_type + '_tickets'],
-            'initial': form.initial.get(ticket_type + '_tickets', 0),
+        form_elements = {
+            ticket_type: {
+                'label': form[ticket_type + '_tickets'].label_tag,
+                'field': form[ticket_type + '_tickets'],
+                'initial': form.initial.get(ticket_type + '_tickets', 0),
+            }
+            for ticket_type in ['child', 'student', 'adult']
         }
-        for ticket_type in ['child', 'student', 'adult']
-    }
 
-    context = {
-        'showing': showing,
-        'form': form,
-        'form_elements': form_elements,
-        'ticket_prices': ticket_prices,
-<<<<<<< HEAD
-        'stripe_publishable_key': settings.STRIPE_PUBLIC_KEY,
-=======
-        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
->>>>>>> origin/main
-    }
-    return render(request, 'cinema/book_showing.html', context)
+        context = {
+            'showing': showing,
+            'form': form,
+            'form_elements': form_elements,
+            'ticket_prices': ticket_prices,
+            'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+        }
+        return render(request, 'cinema/book_showing.html', context)
 
 
 def booking_success(request, booking_id):
@@ -184,26 +151,6 @@ def booking_success(request, booking_id):
     return render(request, 'cinema/booking_success.html', {'booking': booking})
 
 
-<<<<<<< HEAD
-
-
-
-def charge(request, showing_id):
-    showing = get_object_or_404(Showing, pk=showing_id)
-    ticket_prices = TicketPrice.objects.first()
-    context = {
-        'showing': showing,
-        'ticket_prices': ticket_prices,
-        'stripe_publishable_key': settings.STRIPE_PUBLISHABLE_KEY,
-    }
-    return render(request, 'cinema/charge.html', context)
-
-
-
-
-
-=======
->>>>>>> origin/main
 @login_required
 @permission_required("cinema.change_movie")   
 def renfilmhome(request):

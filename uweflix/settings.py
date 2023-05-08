@@ -149,9 +149,6 @@ SESSION_COOKIE_AGE = 300
 SESSION_SAVE_EVERY_REQUEST = True
 
 LOGIN_REDIRECT_URL = 'login'
-<<<<<<< HEAD
-LOGIN_URL = 'login'
-=======
 LOGIN_URL = 'login'
 
 
@@ -162,4 +159,3 @@ STRIPE_SECRET_KEY = 'sk_test_51N4R16E6uc3JprxHdOdOl4d73UDZy6VAFGqAlQVYeNNJjqZz3P
 TIME_ZONE = 'Europe/London'
 
 USE_TZ = True
->>>>>>> origin/main
