@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Movie, Screen, Showing, TicketPrice
-from .forms import filmForm, screenForm, showingForm, BookingForm, Booking
+from .forms import filmForm, screenForm, showingForm, BookingForm, Booking, StudentBookingForm
 from django.contrib.auth.decorators import login_required, permission_required
 #from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.shortcuts import render, redirect
 from django.utils import timezone
 from datetime import timedelta, datetime
 import messages
@@ -42,7 +43,8 @@ def confirm_movie(response,movie_id):
 def showings_list(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
     current_datetime = timezone.now()
-    showings = Showing.objects.filter(film=movie, date__gte=current_datetime.date(), time__gte=current_datetime.time()).order_by('date', 'time')
+    showings = Showing.objects.filter(film=movie, date__gte=current_datetime.date()).order_by('date', 'time')
+    showings = [showing for showing in showings if not (showing.date == current_datetime.date() and showing.time < current_datetime.time())]
     return render(request, 'cinema/showings_list.html', {'movie': movie, 'showings': showings})
 
 
@@ -70,16 +72,16 @@ def book_showing(request, showing_id):
             booking = form.save(commit=False)
             booking.showing = showing
 
-            # Calculate the total price and assign it to the booking
+            #calculate the total price and assign it to the booking
             booking.total_price = calculate_total_price(booking, ticket_prices)
 
-            # Check if there are enough tickets available
+            #check if there are enough tickets available
             available_tickets = showing.screen.capacity - showing.tickets_sold
             if booking.child_tickets + booking.student_tickets + booking.adult_tickets > available_tickets:
                 error_message = 'Not enough tickets available'
                 return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
 
-            # Create a Stripe charge
+            #create a Stripe charge
             token = request.POST.get('stripeToken')
             amount = int(booking.total_price * 100)  # Convert total price to cents
             try:
@@ -90,7 +92,7 @@ def book_showing(request, showing_id):
                     source=token,
                 )
 
-                # Update the tickets_sold attribute of the showing
+                #update the tickets_sold attribute of the showing
                 showing.tickets_sold += booking.child_tickets + booking.student_tickets + booking.adult_tickets
                 showing.save()
                 booking.save()
@@ -98,19 +100,19 @@ def book_showing(request, showing_id):
                 return redirect('booking_success', booking_id=booking.id)
 
             except stripe.error.CardError as e:
-                # Handle declined payment
+                #if declined payment
                 body = e.json_body
                 err = body.get('error', {})
                 error_message = f"Payment declined: {err.get('message')}"
                 return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
 
             except stripe.error.StripeError as e:
-                # Handle other Stripe errors
+                # if stripe errors
                 error_message = "An error occurred while processing your payment. Please try again."
                 return render(request, 'cinema/book_showing.html', {'error_message': error_message})
 
             except Exception as e:
-                # Handle any other exceptions
+                # srtipe errors
                 error_message = "An unexpected error occurred. Please try again."
                 return render(request, 'cinema/book_showing.html', {'error_message': error_message})
     else:
@@ -135,6 +137,94 @@ def book_showing(request, showing_id):
     return render(request, 'cinema/book_showing.html', context)
 
 
+
+def student_book_showing(request, showing_id):
+    showing = get_object_or_404(Showing, pk=showing_id)
+    current_datetime = timezone.now()
+    showing_datetime = datetime.combine(showing.date, showing.time, tzinfo=current_datetime.tzinfo)
+    one_minute_before_showing = showing_datetime - timedelta(minutes=1)
+
+    if current_datetime >= one_minute_before_showing:
+        error_message = 'Booking is not allowed within 1 minute of the showtime'
+        return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
+
+    ticket_prices = TicketPrice.objects.first()
+    if request.method == 'POST':
+        form = StudentBookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.showing = showing
+
+            #save the logged-in user's account to the booking
+            if request.user.is_authenticated:
+                booking.user = request.user
+                booking.email = request.user.email
+
+            #calculate the total price and assign it to the booking
+            booking.total_price = calculate_total_price(booking, ticket_prices)
+
+            #check if there are enough tickets available
+            available_tickets = showing.screen.capacity - showing.tickets_sold
+            if booking.child_tickets + booking.student_tickets + booking.adult_tickets > available_tickets:
+                error_message = 'Not enough tickets available'
+                return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
+
+            #create a Stripe charge
+            token = request.POST.get('stripeToken')
+            amount = int(booking.total_price * 100)  # Convert total price to cents
+            try:
+                charge = stripe.Charge.create(
+                    amount=amount,
+                    currency='gbp',
+                    description='Cinema Ticket Booking',
+                    source=token,
+                )
+
+                #update the tickets_sold attribute of the showing
+                showing.tickets_sold += booking.child_tickets + booking.student_tickets + booking.adult_tickets
+                showing.save()
+                booking.save()
+
+                return redirect('booking_success', booking_id=booking.id)
+
+            except stripe.error.CardError as e:
+                #if declined payment
+                body = e.json_body
+                err = body.get('error', {})
+                error_message = f"Payment declined: {err.get('message')}"
+                return render(request, 'cinema/book_showing.html', {'error_message': error_message, 'showing': showing})
+
+            except stripe.error.StripeError as e:
+                # if stripe errors
+                error_message = "An error occurred while processing your payment. Please try again."
+                return render(request, 'cinema/book_showing.html', {'error_message': error_message})
+
+            except Exception as e:
+                # srtipe errors
+                error_message = "An unexpected error occurred. Please try again."
+                return render(request, 'cinema/book_showing.html', {'error_message': error_message})
+    else:
+        form = StudentBookingForm()
+
+    form_elements = {
+        ticket_type: {
+            'label': form[ticket_type + '_tickets'].label_tag,
+            'field': form[ticket_type + '_tickets'],
+            'initial': form.initial.get(ticket_type + '_tickets', 0),
+        }
+        for ticket_type in ['child', 'student', 'adult']
+    }
+
+    context = {
+        'showing': showing,
+        'form': form,
+        'form_elements': form_elements,
+        'ticket_prices': ticket_prices,
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+    }
+    return render(request, 'cinema/student_book_showing.html', context)
+
+
 def booking_success(request, booking_id):
     booking = get_object_or_404(Booking, pk=booking_id)
 
@@ -155,6 +245,10 @@ def booking_success(request, booking_id):
     send_booking_email(booking)
 
     return render(request, 'cinema/booking_success.html', {'booking': booking})
+
+
+def not_enough_tickets(request):
+    return render(request, 'cinema/not_enough_tickets.html')
 
 
 @login_required

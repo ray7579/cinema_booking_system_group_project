@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import datetime
+import pytz
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -157,3 +159,7 @@ STRIPE_SECRET_KEY = 'sk_test_51N4R16E6uc3JprxHdOdOl4d73UDZy6VAFGqAlQVYeNNJjqZz3P
 SENDINBLUE_API_KEY = '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'
 SENDINBLUE_SENDER_EMAIL = 'info.uweflixcinema@gmail.com'
 SENDINBLUE_SENDER_NAME = 'UWEFlix Cinema'
+
+TIME_ZONE = 'Europe/London'
+
+USE_TZ = True

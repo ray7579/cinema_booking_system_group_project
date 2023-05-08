@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator
+from accounts.models import User
 
 
 class Movie(models.Model):
@@ -50,6 +51,7 @@ class TicketPrice(models.Model):
 
 class Booking(models.Model):
     email = models.EmailField()
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     showing = models.ForeignKey(Showing, on_delete=models.CASCADE)
     child_tickets = models.PositiveIntegerField(default=0)
     student_tickets = models.PositiveIntegerField(default=0)

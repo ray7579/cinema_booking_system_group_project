@@ -8,6 +8,7 @@
         <div class="card-body">
           <h1 class="card-title text-center">Booking Confirmation</h1>
           <p class="card-text text-center">Your booking for {{ booking.showing.film }} at {{ booking.showing.time }} has been confirmed.</p>
+          <p class="card-text text-center">We have sent an email confirmation to {{ booking.email }}. </p>
           <hr>
           <div class="row">
             <div class="col-md-6">
@@ -29,7 +30,7 @@
             </div>
             <div class="col-md-6">
               <p class="text-right">Total price:</p>
-              <p class="h3 text-right">{{ booking.total_price }}</p>
+              <p class="h3 text-right"> £ {{ booking.total_price }}</p>
             </div>
           </div>
           <hr>
