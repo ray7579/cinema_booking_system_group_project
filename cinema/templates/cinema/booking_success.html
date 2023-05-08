@@ -10,6 +10,27 @@
           <p class="card-text text-center">Your booking for {{ booking.showing.film }} at {{ booking.showing.time }} has been confirmed.</p>
           <p class="card-text text-center">We have sent an email confirmation to {{ booking.email }}. </p>
           <hr>
+
+          {% if booking.user.is_clubrep %}
+          <div class="row">
+            <div class="col-md-6">
+              <p>You have booked:</p>
+              <ul class="list-group">
+                
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  Student Tickets
+                  <span>{{ booking.student_tickets }}</span>
+                </li>
+                
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <p class="text-right">Total price:</p>
+              <p class="h3 text-right"> £ {{ booking.total_price }}</p>
+            </div>
+          </div>
+          <hr>
+          {% else %}
           <div class="row">
             <div class="col-md-6">
               <p>You have booked:</p>
@@ -34,6 +55,8 @@
             </div>
           </div>
           <hr>
+          {% endif %}
+
           <div class="text-center">
             <p>A confirmation email including your QR code ticket has been sent to your email address.</p>
             <a href="{% url 'home' %}" class="btn btn-primary">Return Home</a>

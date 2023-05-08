@@ -40,3 +40,17 @@ class StudentBookingForm(forms.ModelForm):
     class Meta:
         model = Booking
         fields = ['child_tickets', 'student_tickets', 'adult_tickets']
+
+
+
+class ClubRepBookingForm(forms.ModelForm):
+    student_tickets = forms.IntegerField(
+        label='Student Tickets',
+        initial=10,
+        min_value=10,
+        widget=forms.NumberInput(attrs={'min': 10})
+    )
+
+    class Meta:
+        model = Booking
+        fields = ['student_tickets']

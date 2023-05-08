@@ -12,6 +12,9 @@
             {% if request.user.is_student %}
             <a href="{% url 'student_book_showing' showing_id=showing.pk %}" class="btn btn-primary">Student Book now</a>
             
+            {% elif request.user.is_clubrep %}
+            <a href="{% url 'club_rep_book_showing' showing_id=showing.pk %}" class="btn btn-primary">Club Rep Book now</a>
+
             {% else %}
             <a href="{% url 'book_showing' showing_id=showing.pk %}" class="btn btn-primary">Book now</a>
             {% endif %}
