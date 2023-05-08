@@ -34,3 +34,9 @@ class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
         fields = ['email', 'child_tickets', 'student_tickets', 'adult_tickets']
+
+
+class StudentBookingForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['child_tickets', 'student_tickets', 'adult_tickets']
