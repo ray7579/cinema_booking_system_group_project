@@ -8,7 +8,7 @@
         <div class="card-body">
           <h1 class="card-title text-center">Booking Confirmation</h1>
           <p class="card-text text-center">Your booking for {{ booking.showing.film }} at {{ booking.showing.time }} has been confirmed.</p>
-          <p class="card-text text-center">We have sent an email confirmation to {{ booking.email }}. </p>
+          <p class="card-text text-center">We have sent an email confirmation to {{ booking.email }} </p>
           <hr>
 
           {% if booking.user.is_clubrep %}
