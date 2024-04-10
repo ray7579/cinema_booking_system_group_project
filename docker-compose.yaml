@@ -2,22 +2,23 @@ version: "3.9"
 
 services:
   web:
-    build: .
-    command: python manage.py runserver 0.0.0.0:5432
+    build: 
+      context: .
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - .:/code
+      - .:/app
     ports:
-      - 5433:5432
+      - 8000:8000
     depends_on:
       - db
   db:
-    image: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
+    image: postgres:latest
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
- 
+      POSTGRES_DB: uweflix
+      POSTGRES_USER: test-user
+      POSTGRES_PASSWORD: test-password
+    ports:
+      - "5432:5432"
+
 volumes:
   postgres_data:

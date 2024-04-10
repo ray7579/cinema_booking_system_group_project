@@ -1,7 +1,5 @@
 from django import forms
-from .models import Movie
-from .models import Screen
-from .models import Showing
+from .models import Movie, Screen, Showing, Booking
 
 class filmForm(forms.ModelForm):
     class Meta:
@@ -30,3 +28,29 @@ class showingForm(forms.ModelForm):
             'date': forms.DateInput(attrs={'class': 'form-control'}),
             'time': forms.TimeInput(attrs={'class': 'form-control'}),
         }
+
+
+class BookingForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['email', 'child_tickets', 'student_tickets', 'adult_tickets']
+
+
+class StudentBookingForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['child_tickets', 'student_tickets', 'adult_tickets']
+
+
+
+class ClubRepBookingForm(forms.ModelForm):
+    student_tickets = forms.IntegerField(
+        label='Student Tickets',
+        initial=10,
+        min_value=10,
+        widget=forms.NumberInput(attrs={'min': 10})
+    )
+
+    class Meta:
+        model = Booking
+        fields = ['student_tickets']

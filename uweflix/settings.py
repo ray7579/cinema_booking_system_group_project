@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import datetime
+import pytz
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,7 +28,7 @@ SECRET_KEY = 'django-insecure-obdvji#6$v@&xz4h9)7g13!qwvjvsg55)b=a82+^g*y8@8ccj!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -42,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'cinema',
-    'ticket_booking',
 ]
 
 MIDDLEWARE = [
@@ -85,8 +86,8 @@ DATABASES = {
             'NAME': 'uweflix',
             'USER': 'test-user',
             'PASSWORD': 'test-password',
-            'HOST': '127.0.0.1',
-            'PORT': 5433,
+            'HOST': 'db',
+            'PORT': 5432,
         }
     }
 
@@ -151,6 +152,14 @@ LOGIN_REDIRECT_URL = 'login'
 LOGIN_URL = 'login'
 
 
+STRIPE_PUBLIC_KEY = 'pk_test_51N4R16E6uc3JprxHd98BpLEWodnZP8zULKLkvkbmFF7AlzK52TuI2VG5PBuWTzEUUryhI1NHG563CRm0y7pwAAPj00yAsTKNQ7'
+STRIPE_SECRET_KEY = 'sk_test_51N4R16E6uc3JprxHdOdOl4d73UDZy6VAFGqAlQVYeNNJjqZz3PLdAu9hRf7QefZPJEvcXF3qOVIW9ru6L6qXvVVz00miSlBRnj'
+#keys by uhhngy
 
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51Mo8sWIX1naRcdLHbe2PdgmId9f9W1fIKqJGS7O7QZQR8X3ijkC2IsDLfAk94sqJOJtmHXAADf4YEht6ZZ111Whe009WfUuZAW'
-STRIPE_SECRET_KEY = 'sk_test_51Mo8sWIX1naRcdLHwWCVnyMYWId4cEotVvrTrxitm6QyXF7dhYKXRWVAYHATvvJRYJkqN73X87nXtv4djfWcZSan001CE5pamN'
+SENDINBLUE_API_KEY = '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'
+SENDINBLUE_SENDER_EMAIL = 'info.uweflixcinema@gmail.com'
+SENDINBLUE_SENDER_NAME = 'UWEFlix Cinema'
+
+TIME_ZONE = 'Europe/London'
+
+USE_TZ = True

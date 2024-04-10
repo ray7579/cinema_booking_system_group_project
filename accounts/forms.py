@@ -6,6 +6,7 @@ from django.contrib.auth.models import Group
 
 
 class StudentSignUpForm(UserCreationForm):
+    email = forms.EmailField(required=True)
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
 
@@ -16,6 +17,7 @@ class StudentSignUpForm(UserCreationForm):
     def save(self):
         user = super().save(commit=False)
         user.is_student = True
+        user.email = self.cleaned_data.get('email')
         user.first_name = self.cleaned_data.get('first_name')
         user.last_name = self.cleaned_data.get('last_name')
         user.save()
@@ -26,6 +28,7 @@ class StudentSignUpForm(UserCreationForm):
     
     
 class ClubRepSignUpForm(UserCreationForm):
+    email = forms.EmailField(required=True)
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
     clubname = forms.CharField(required=True)
@@ -43,6 +46,7 @@ class ClubRepSignUpForm(UserCreationForm):
     def save(self):
         user = super().save(commit=False)
         user.is_clubrep = True
+        user.email = self.cleaned_data.get('email')
         user.first_name = self.cleaned_data.get('first_name')
         user.last_name = self.cleaned_data.get('last_name')
         user.save()
@@ -58,6 +62,7 @@ class ClubRepSignUpForm(UserCreationForm):
         return clubrep
     
 class CinemamanagerSignUpForm(UserCreationForm):
+    email = forms.EmailField(required=True)
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
 
@@ -68,6 +73,7 @@ class CinemamanagerSignUpForm(UserCreationForm):
     def save(self):
         user = super().save(commit=False)
         user.is_cinemamanager = True
+        user.email = self.cleaned_data.get('email')
         user.first_name = self.cleaned_data.get('first_name')
         user.last_name = self.cleaned_data.get('last_name')
         user.save()
@@ -78,6 +84,7 @@ class CinemamanagerSignUpForm(UserCreationForm):
         return manager  
     
 class AccountmanagerSignUpForm(UserCreationForm):
+    email = forms.EmailField(required=True)
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
 
@@ -88,6 +95,7 @@ class AccountmanagerSignUpForm(UserCreationForm):
     def save(self):
         user = super().save(commit=False)
         user.is_accountmanager = True
+        user.email = self.cleaned_data.get('email')
         user.first_name = self.cleaned_data.get('first_name')
         user.last_name = self.cleaned_data.get('last_name')
         user.save()
@@ -114,7 +122,16 @@ class ClubrepUpdateForm(forms.ModelForm):
         fields = ['clubname', 'street_no', 'street', 'city', 'postcode', 'landline_no', 'mobile_no', 'credit']
 
 
+class AccountmanagerUpdateForm(forms.ModelForm):
+    class Meta:
+        model = AccountManager
+        fields = '__all__'
+      
 
+class CinemamanagerUpdateForm(forms.ModelForm):
+    class Meta:
+        model = CinemaManager
+        fields = '__all__'
 
 
 

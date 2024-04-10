@@ -1,0 +1,54 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Booking Month Select{% endblock %}
+
+{% block content %}
+
+  <h1>Booking History for {{ user.username }}</h1>
+  <ul class="month-list">
+    {% for year, month in months %}
+      <li><a href="{% url 'booking_month_view' user.id year month %}">{{ month }}/{{ year }}</a></li>
+    {% empty %}
+      <li>No bookings found.</li>
+    {% endfor %}
+  </ul>
+
+  <style>
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #fff;
+    }
+
+    .month-list {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .month-list li {
+      margin: 10px;
+      background-color: #3a3e6d;
+      padding: 15px 25px;
+      border-radius: 5px;
+      font-size: 18px;
+    }
+
+    .month-list li a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .month-list li:hover {
+      background-color: #245b96;
+      cursor: pointer;
+    }
+
+    .month-list li a:hover {
+      color: #fff;
+    }
+  </style>
+
+{% endblock %}

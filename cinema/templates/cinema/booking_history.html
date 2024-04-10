@@ -1,0 +1,24 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Booking History{% endblock %}
+
+{% block content %}
+  <h2 class="text-white">Booking history for {{ user.username }}:</h2>
+  <div class="scrollable">
+    {% for booking in bookings %}
+      <div class="movieblock">
+        <div class="Description">
+          <p class="text-white">
+            Showing: {{ booking.showing }} <br/>
+            Number of Child Tickets: {{ booking.child_tickets }} <br/>
+            Number of Student Tickets: {{ booking.student_tickets }} <br/>
+            Number of Adult Tickets: {{ booking.adult_tickets }} <br/>
+            Total Price: £{{ booking.total_price }} <br/>
+          </p>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-white">No bookings found for this user.</p>
+    {% endfor %}
+  </div>
+{% endblock %}
