@@ -3,14 +3,18 @@
 {% block title %}Screen Management{% endblock %}
 
 {% block content %}
-<h1 class="text-white">Home Page: All the Screens</h1>
-<button onclick="window.location.href='addscreen/'" class="btn btn-secondary">Add Screen</button>
+<div class="head">
+  <h1 class="text-white">Home Page: All the Screens</h1>
+  <button onclick="window.location.href='addscreen/'" class="btn btn-secondary">Add Screen</button>
+</div>
 
 {% for screen in screen %}
 <div class="screenblock">
   <div class="screen-details">
+    <div class="text-white">
       Screen Number: {{ screen.number }} <br/>
       Screen Capacity: {{ screen.capacity }} <br/>
+    </div>
   </div>
   <div class="buttons">
     <button onclick="window.location.href='updatescreen/{{ screen.id }}'" class="btn btn-outline-danger">Update Screen</button>
@@ -20,6 +24,9 @@
 {% endfor %}
 
 <style>
+  .head{
+    padding-bottom: 10px;
+  }
   .screen-details {
     text-align: left;
   }
@@ -37,7 +44,6 @@
     justify-content: center;
     align-items: center;
     margin-bottom: 1rem;
-    background-color: #afafaf;
     border-radius: 10px;
     padding: 10px;
     gap: 1rem;
